@@ -4,9 +4,7 @@ import Link from "next/link"
 import { LogOut, MenuIcon } from "lucide-react"
 import { ThemeDropDown } from "./ThemeDropDown"
 
-type Props = {}
-
-const Navbar = (props: Props) => {
+const Navbar = () => {
   return (
     <div className="w-full flex justify-between sticky top-0 items-center py-5 px-3 z-50">
       <Link href={"/"} >
