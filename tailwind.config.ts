@@ -24,7 +24,10 @@ export default {
 				},
 			  },
 			},
-		  
+			fontFamily: {
+				poppins: ['Poppins', 'serif'],
+				montserrat: ['Montserrat', 'serif'],
+			  },
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',

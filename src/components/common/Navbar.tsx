@@ -6,7 +6,7 @@ import { ThemeDropDown } from "./ThemeDropDown"
 
 const Navbar = () => {
   return (
-    <div className="w-full flex justify-between sticky top-0 items-center py-5 px-3 z-50">
+    <div className="w-full font-poppins flex justify-between sticky top-0 items-center py-5 px-3 z-50">
       <Link href={"/"} >
       <p className="font-bold text-2xl">Ignify.</p>
       </Link>
