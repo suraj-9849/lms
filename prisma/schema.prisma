@@ -15,6 +15,7 @@ datasource db {
 model User {
   user_id           String           @id @default(uuid())
   email             String           @unique
+  password          String
   display_name      String           @default("BabuRao")
   profile_url       String?          @default("https://i.pinimg.com/control2/236x/97/6a/9c/976a9cd8b01f90b2c91f575d47d353bf.jpg")
   createdAt         DateTime         @default(now())
@@ -42,9 +43,9 @@ model CoursePurchase {
   purchase_id    String   @id @default(uuid())
   payment_status Boolean
   purchased_at   DateTime @default(now())
-  user   User   @relation(fields: [user_id], references: [user_id])
+  user           User     @relation(fields: [user_id], references: [user_id])
   user_id        String
-  course Course @relation(fields: [course_id], references: [course_id])
+  course         Course   @relation(fields: [course_id], references: [course_id])
   course_id      Int
 }
 
