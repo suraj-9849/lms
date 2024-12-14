@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id           String           @id @default(uuid())
+  email             String           @unique
+  password          String
+  display_name      String           @default("BabuRao")
+  profile_url       String?          @default("https://i.pinimg.com/control2/236x/97/6a/9c/976a9cd8b01f90b2c91f575d47d353bf.jpg")
+  createdAt         DateTime         @default(now())
+  is_course_creator Boolean          @default(false)
+  created_courses   Course[]         @relation("CreatedCourses")
+  purchased_courses CoursePurchase[]
+}
+
+model Course {
+  course_id     Int              @id @default(autoincrement())
+  title         String
+  description   String?
+  category      String
+  price         Float
+  rating        Float?           @default(0.0)
+  video_count   Int              @default(0)
+  student_count Int              @default(0)
+  created_at    DateTime         @default(now())
+  creator       User             @relation("CreatedCourses", fields: [creator_id], references: [user_id])
+  creator_id    String
+  purchases     CoursePurchase[]
+}
+
+model CoursePurchase {
+  purchase_id    String   @id @default(uuid())
+  payment_status Boolean
+  purchased_at   DateTime @default(now())
+  user           User     @relation(fields: [user_id], references: [user_id])
+  user_id        String
+  course         Course   @relation(fields: [course_id], references: [course_id])
+  course_id      Int
+}
+
+/// From Eraser.IO :
+
+// users [icon: user, color: orange] {
+//   user_id String pk
+//   email String unique
+//   display_name String 
+//   profile_url String
+//   createdAt Date
+//   is_course_creator Boolean
+//   created_courses Course[]
+//   purchased_courses CoursePurchase[]
+// }
+
+// Course [icon: laptop, color: purple] {
+//   course_id String pk
+//   title String
+//   description String
+//   category String
+//   price Float
+//   rating Float
+//   video_count Integer
+//   student_count Integer
+//   creator_id String 
+//   status String
+//   created_at Date
+// }
+
+// CoursePurchase [icon: money, color: yellow] {
+//   purchase_id String pk
+//   course_id String 
+//   user_id String 
+//   payment_status Boolean
+//   purchased_at Date
+// }
+
+// Course.creator_id > users.created_courses        // Many courses can be created by one user
+// CoursePurchase.course_id > Course.course_id      // Many purchases can be for one course
+// CoursePurchase.user_id > users.purchased_courses // Many purchases can be made by one user
