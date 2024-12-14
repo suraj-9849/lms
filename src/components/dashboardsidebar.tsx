@@ -5,7 +5,9 @@ export function Sidebar() {
   return (
     <div className="flex w-64 flex-col bg-gray-800">
       <div className="flex h-20 items-center justify-center shadow-md">
-        <h1 className="text-3xl uppercase text-indigo-500">LMS</h1>
+        <Link href={'/dashboard'}>
+          <h1 className="text-3xl uppercase text-indigo-500">LMS</h1>
+        </Link>
       </div>
       <ul className="flex flex-col py-4">
         <li>
@@ -16,7 +18,7 @@ export function Sidebar() {
             <span className="inline-flex h-12 w-12 items-center justify-center text-lg text-gray-400">
               <Home className="h-5 w-5" />
             </span>
-            <span className="text-sm font-medium">Dashboard</span>
+            <span className="text-sm font-medium">Home</span>
           </Link>
         </li>
         <li>

@@ -2,6 +2,9 @@ import { existsOrNot } from '@/utils/db';
 import { verifyPassword } from '@/utils/password';
 import { signInSchema } from '@/utils/zod';
 import { NextRequest, NextResponse } from 'next/server';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,10 +26,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ msg: 'Invalid credentials' }, { status: 401 });
     }
 
-    return NextResponse.json({
+    const token = jwt.sign({  email: user.email }, JWT_SECRET, {
+      expiresIn: '1d',
+    });
+
+    const response = NextResponse.json({
       msg: 'Login successful',
       user: { email: user.email, displayName: user.display_name },
     });
+
+    response.cookies.set('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 86400,
+      path: '/',
+    });
+
+    return response;
   } catch (error) {
     console.error('Error:', error);
     return NextResponse.json({ msg: 'error' }, { status: 500 });
