@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Home, BookOpen, Users, Settings } from 'lucide-react';
+import { Home, BookOpen, Users, Settings, Plus } from 'lucide-react';
 
 export function Sidebar() {
   return (
@@ -10,7 +10,7 @@ export function Sidebar() {
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
-              fill="none"
+              fill="#fff"
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
@@ -20,7 +20,7 @@ export function Sidebar() {
               <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
             </svg>
           </div>
-          <span className="text-xl font-semibold">LMS</span>
+          <span className="text-xl font-semibold text-white">LMS</span>
         </div>
       </div>
       <ul className="flex flex-col py-4">
@@ -44,6 +44,17 @@ export function Sidebar() {
               <BookOpen className="h-5 w-5" />
             </span>
             <span className="text-sm font-medium">Courses</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/dashboard/create-course"
+            className="flex h-12 transform flex-row items-center text-gray-500 transition-transform duration-200 ease-in hover:translate-x-2 hover:text-gray-200"
+          >
+            <span className="inline-flex h-12 w-12 items-center justify-center text-lg text-gray-400">
+              <Plus className="h-5 w-5" />
+            </span>
+            <span className="text-sm font-medium">Create</span>
           </Link>
         </li>
         <li>

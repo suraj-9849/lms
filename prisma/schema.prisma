@@ -34,6 +34,7 @@ model Course {
   video_count   Int              @default(0)
   student_count Int              @default(0)
   created_at    DateTime         @default(now())
+  thumbnail     String           @default("https://i.pinimg.com/control2/236x/97/6a/9c/976a9cd8b01f90b2c91f575d47d353bf.jpg")
   creator       User             @relation("CreatedCourses", fields: [creator_id], references: [user_id])
   creator_id    String
   purchases     CoursePurchase[]

@@ -1,11 +1,57 @@
+'use client';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
 import { UserAuthForm } from '@/components/user-auth-form';
+import { useCallback, useEffect, useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
+import { UserSchema } from '@/utils/Interfaces';
+import toast from 'react-hot-toast';
 
 export default function LoginPage() {
+  const [user, setUser] = useState<UserSchema | null>(null);
+  const { isLoggedIn, isLoading, userId, email } = useAuth();
+  const router = useRouter();
+
+  //  useCallback: to memoize the fetchUserProfile
+  const fetchUserProfile = useCallback(async () => {
+    if (!userId || !email) return;
+
+    try {
+      const response = await fetch('/api/user/profile', {
+        method: 'GET',
+        headers: {
+          'X-User-Id': userId,
+          'X-User-Email': email,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch user profile');
+      }
+
+      const userData = await response.json();
+      setUser(userData);
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? String(error) : 'An Unknown Error!';
+      console.log(errMsg);
+      toast.error('Failed to load user profile');
+    }
+  }, [userId, email]);
+  useEffect(() => {
+    if (isLoggedIn && userId && email && !user) {
+      fetchUserProfile();
+      router.push('/dashboard');
+    } else if (!isLoading && !isLoggedIn) {
+      router.push('/login');
+    }
+  }, [isLoggedIn, isLoading, userId, email, router, fetchUserProfile, user]);
   return (
     <>
       <div className="md:hidden">

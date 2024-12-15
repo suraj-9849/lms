@@ -1,17 +1,20 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
-import { User, Upload, Plus } from 'lucide-react';
+import { User, Upload, LogOut, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { CourseCard } from '@/components/course-card';
 import toast from 'react-hot-toast';
@@ -22,10 +25,10 @@ import { UserSchema } from '@/utils/Interfaces';
 export default function ProfilePage() {
   const [user, setUser] = useState<UserSchema | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { isLoggedIn, isLoading, userId, email } = useAuth();
+  const { isLoggedIn, isLoading, userId, email, logout } = useAuth();
   const router = useRouter();
 
-  //  useCallback: to memoize the fetchUserProfile
+  // Memoized fetch user profile function
   const fetchUserProfile = useCallback(async () => {
     if (!userId || !email) return;
 
@@ -54,6 +57,7 @@ export default function ProfilePage() {
       toast.error('Failed to load user profile');
     }
   }, [userId, email]);
+
   useEffect(() => {
     if (isLoggedIn && userId && email && !user) {
       fetchUserProfile();
@@ -61,6 +65,7 @@ export default function ProfilePage() {
       router.push('/login');
     }
   }, [isLoggedIn, isLoading, userId, email, router, fetchUserProfile, user]);
+
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -113,6 +118,11 @@ export default function ProfilePage() {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -133,55 +143,64 @@ export default function ProfilePage() {
     <div className="container mx-auto py-10">
       <Card className="mx-auto w-full max-w-4xl">
         <CardContent className="p-6">
-          <div className="flex flex-col items-center space-y-4">
-            <div className="relative">
-              <Avatar className="h-32 w-32">
-                <AvatarImage src={user.profile_url || undefined} />
-                <AvatarFallback>
-                  <User className="h-16 w-16" />
-                </AvatarFallback>
-              </Avatar>
-              <label
-                htmlFor="image-upload"
-                className="absolute bottom-0 right-0 cursor-pointer rounded-full bg-primary p-2 text-primary-foreground"
-              >
-                <Upload className="h-4 w-4" />
-              </label>
-              <input
-                id="image-upload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleImageUpload}
-              />
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="relative">
+                <Avatar className="h-32 w-32">
+                  <AvatarImage src={user.profile_url || undefined} />
+                  <AvatarFallback>
+                    <User className="h-16 w-16" />
+                  </AvatarFallback>
+                </Avatar>
+                <label
+                  htmlFor="image-upload"
+                  className="absolute bottom-0 right-0 cursor-pointer rounded-full bg-primary p-2 text-primary-foreground"
+                >
+                  <Upload className="h-4 w-4" />
+                </label>
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+              </div>
+              <h2 className="text-2xl font-bold">{user.display_name}</h2>
+              <p className="text-muted-foreground">{user.email}</p>
             </div>
-            <h2 className="text-2xl font-bold">{user.display_name}</h2>
-            <p className="text-muted-foreground">{user.email}</p>
 
-            {!user.is_course_creator && (
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="mt-4">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Become a Course Creator
+            <div className="flex items-center space-x-4">
+              {/* Role Change Dialog */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <Settings className="h-4 w-4" />
                   </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Become a Course Creator</DialogTitle>
-                    <DialogDescription>
-                      Are you sure you want to become a course creator?
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="mt-4 flex justify-center space-x-4">
-                    <Button onClick={() => handleRoleChange(true)}>Yes, I&apos;m sure</Button>
-                    <Button variant="outline" onClick={() => {}}>
-                      Cancel
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            )}
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Change User Role</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {user.is_course_creator
+                        ? 'Do you want to switch back to being a student?'
+                        : 'Do you want to become a course creator?'}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => handleRoleChange(!user.is_course_creator)}>
+                      Confirm
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
+              {/* Logout Button */}
+              <Button variant="destructive" size="icon" onClick={handleLogout}>
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
 
           <Tabs defaultValue="purchased" className="mt-8">
