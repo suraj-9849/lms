@@ -1,6 +1,5 @@
 'use client';
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { User, Upload, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -26,21 +25,26 @@ export default function ProfilePage() {
   const { isLoggedIn, isLoading, userId, email } = useAuth();
   const router = useRouter();
 
-  const fetchUserProfile = async () => {
+  //  useCallback: to memoize the fetchUserProfile
+  const fetchUserProfile = useCallback(async () => {
+    if (!userId || !email) return;
+
     try {
       const response = await fetch('/api/user/profile', {
         method: 'GET',
         headers: {
-          'X-User-Id': userId || '', // Main
-          'X-User-Email': email || '', // Main
+          'X-User-Id': userId,
+          'X-User-Email': email,
           'Content-Type': 'application/json',
         },
         credentials: 'include',
       });
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to fetch user profile');
       }
+
       const userData = await response.json();
       setUser(userData);
       setError(null);
@@ -49,16 +53,14 @@ export default function ProfilePage() {
       setError(error instanceof Error ? error.message : 'An unknown error occurred');
       toast.error('Failed to load user profile');
     }
-  };
-
+  }, [userId, email]);
   useEffect(() => {
-    if (isLoggedIn && userId && email) {
+    if (isLoggedIn && userId && email && !user) {
       fetchUserProfile();
     } else if (!isLoading && !isLoggedIn) {
       router.push('/login');
     }
-  }, [isLoggedIn, isLoading, userId, email, router, fetchUserProfile]);
-
+  }, [isLoggedIn, isLoading, userId, email, router, fetchUserProfile, user]);
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
