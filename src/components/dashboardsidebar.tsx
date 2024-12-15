@@ -3,11 +3,25 @@ import { Home, BookOpen, Users, Settings } from 'lucide-react';
 
 export function Sidebar() {
   return (
-    <div className="flex w-64 flex-col bg-gray-800">
-      <div className="flex h-20 items-center justify-center shadow-md">
-        <Link href={'/dashboard'}>
-          <h1 className="text-3xl uppercase text-indigo-500">LMS</h1>
-        </Link>
+    <div className="flex w-64 flex-col bg-gray-900">
+      <div className="ml-2 inline-flex h-20 items-center shadow-md">
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg font-bold">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-6 w-6"
+            >
+              <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
+            </svg>
+          </div>
+          <span className="text-xl font-semibold">LMS</span>
+        </div>
       </div>
       <ul className="flex flex-col py-4">
         <li>
