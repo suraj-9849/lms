@@ -3,6 +3,12 @@ import { verifyPassword } from '@/utils/password';
 import { signInSchema } from '@/utils/zod';
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
+interface User {
+  user_id: string;
+  email: string;
+  password: string;
+  display_name: string;
+}
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -17,7 +23,7 @@ export async function POST(request: NextRequest) {
 
     const { email, password } = ZodValidation.data;
 
-    const user = await existsOrNot(email);
+    const user: User | null = await existsOrNot(email);
     if (!user) {
       return NextResponse.json({ msg: 'User does not exist' }, { status: 401 });
     }
@@ -25,11 +31,9 @@ export async function POST(request: NextRequest) {
     if (!isPasswordValid) {
       return NextResponse.json({ msg: 'Invalid credentials' }, { status: 401 });
     }
-
-    const token = jwt.sign({  email: user.email }, JWT_SECRET, {
+    const token = jwt.sign({ userId: user.user_id, email: user.email }, JWT_SECRET, {
       expiresIn: '1d',
     });
-
     const response = NextResponse.json({
       msg: 'Login successful',
       user: { email: user.email, displayName: user.display_name },
@@ -39,9 +43,11 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 86400,
+      maxAge: 86400, // 1 day
       path: '/',
     });
+
+    console.log('Token set in cookie:', token);
 
     return response;
   } catch (error) {
