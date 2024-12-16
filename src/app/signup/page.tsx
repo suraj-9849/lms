@@ -1,22 +1,21 @@
-import Image from 'next/image';
 import Link from 'next/link';
-
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
 import { UserSignUpForm } from '@/components/user-signup-form';
+import { SafeImage } from '@/components/ui/SafeImage';
 
 export default function SignUpPage() {
   return (
     <>
       <div className="md:hidden">
-        <Image
+        <SafeImage
           src="/examples/authentication-light.png"
           width={1280}
           height={843}
           alt="Authentication"
           className="block dark:hidden"
         />
-        <Image
+        <SafeImage
           src="/examples/authentication-dark.png"
           width={1280}
           height={843}

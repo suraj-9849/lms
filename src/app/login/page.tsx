@@ -1,5 +1,4 @@
 'use client';
-import Image from 'next/image';
 import Link from 'next/link';
 
 import { cn } from '@/lib/utils';
@@ -10,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { UserSchema } from '@/utils/Interfaces';
 import toast from 'react-hot-toast';
+import { SafeImage } from '@/components/ui/SafeImage';
 
 export default function LoginPage() {
   const [user, setUser] = useState<UserSchema | null>(null);
@@ -55,14 +55,14 @@ export default function LoginPage() {
   return (
     <>
       <div className="md:hidden">
-        <Image
+        <SafeImage
           src="/examples/authentication-light.png"
           width={1280}
           height={843}
           alt="Authentication"
           className="block dark:hidden"
         />
-        <Image
+        <SafeImage
           src="/examples/authentication-dark.png"
           width={1280}
           height={843}

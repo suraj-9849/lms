@@ -1,6 +1,6 @@
-import Image from 'next/image';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { SafeImage } from './ui/SafeImage';
 
 interface CourseCardProps {
   title: string;
@@ -13,7 +13,7 @@ interface CourseCardProps {
 export function CourseCard({ title, description, image, progress, students }: CourseCardProps) {
   return (
     <Card className="overflow-hidden">
-      <Image
+      <SafeImage
         src={image}
         alt={title}
         width={200}
