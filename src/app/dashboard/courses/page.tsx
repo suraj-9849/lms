@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { PlusCircle, BookOpen, Users } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import GradualSpacing from '@/components/ui/gradual-spacing';
-import Image from 'next/image';
+import { SafeImage } from '@/components/ui/SafeImage';
 
 const CoursePage = () => {
   const [user, setUser] = useState<UserSchema | null>(null);
@@ -153,7 +153,7 @@ const CoursePage = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow">
-                  <Image
+                  <SafeImage
                     src="/r.jpg"
                     alt={course.title}
                     className="mb-4 h-40 w-full rounded-md object-cover"
