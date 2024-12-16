@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useEffect, useCallback } from 'react';
 import { User, Upload, LogOut, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,7 +29,6 @@ export default function ProfilePage() {
   const { isLoggedIn, isLoading, userId, email, logout } = useAuth();
   const router = useRouter();
 
-  // Memoized fetch user profile function
   const fetchUserProfile = useCallback(async () => {
     if (!userId || !email) return;
 
@@ -76,6 +76,8 @@ export default function ProfilePage() {
           const response = await fetch('/api/user/profile', {
             method: 'PUT',
             headers: {
+              'X-User-Id': userId || '',
+              'X-User-Email': email || '',
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({ profile_url: imageUrl }),
@@ -101,6 +103,8 @@ export default function ProfilePage() {
       const response = await fetch('/api/user/profile', {
         method: 'PUT',
         headers: {
+          'X-User-Id': userId || '',
+          'X-User-Email': email || '',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ is_course_creator: isCourseCreator }),
@@ -171,7 +175,6 @@ export default function ProfilePage() {
             </div>
 
             <div className="flex items-center space-x-4">
-              {/* Role Change Dialog */}
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="outline" size="icon">
@@ -196,7 +199,6 @@ export default function ProfilePage() {
                 </AlertDialogContent>
               </AlertDialog>
 
-              {/* Logout Button */}
               <Button variant="destructive" size="icon" onClick={handleLogout}>
                 <LogOut className="h-4 w-4" />
               </Button>
@@ -212,29 +214,31 @@ export default function ProfilePage() {
             </TabsList>
             <TabsContent value="purchased">
               <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {user.purchased_courses.map((purchase) => (
-                  <CourseCard
-                    key={purchase.course.course_id}
-                    title={purchase.course.title}
-                    description={purchase.course.description || ''}
-                    image="/placeholder.svg?height=100&width=200"
-                    progress={0}
-                  />
-                ))}
+                {user.purchased_courses &&
+                  user.purchased_courses.map((purchase) => (
+                    <CourseCard
+                      key={purchase.course.course_id}
+                      title={purchase.course.title}
+                      description={purchase.course.description || ''}
+                      image="/placeholder.svg?height=100&width=200"
+                      progress={0}
+                    />
+                  ))}
               </div>
             </TabsContent>
             {user.is_course_creator && (
               <TabsContent value="published">
                 <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {user.created_courses.map((course) => (
-                    <CourseCard
-                      key={course.course_id}
-                      title={course.title}
-                      description={course.description || ''}
-                      image="/placeholder.svg?height=100&width=200"
-                      students={course.student_count}
-                    />
-                  ))}
+                  {user.created_courses &&
+                    user.created_courses.map((course) => (
+                      <CourseCard
+                        key={course.course_id}
+                        title={course.title}
+                        description={course.description || ''}
+                        image="r.jpg"
+                        students={course.student_count}
+                      />
+                    ))}
                 </div>
               </TabsContent>
             )}

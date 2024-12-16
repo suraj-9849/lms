@@ -42,3 +42,40 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export async function GET(request: NextRequest) {
+  try {
+    const userId = request.headers.get('X-User-Id');
+    const userEmail = request.headers.get('X-User-Email');
+
+    if (!userId || !userEmail) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
+    const courses = await prisma.course.findMany({
+      include: {
+        creator: {
+          select: {
+            display_name: true,
+            profile_url: true,
+          },
+        },
+      },
+    });
+
+    const formattedCourses = courses.map(course => ({
+      course_id: course.course_id,
+      title: course.title,
+      description: course.description,
+      image_url: course.thumbnail || '/placeholder-course.jpg',
+      creator_name: course.creator.display_name,
+      creator_avatar: course.creator.profile_url,
+    }));
+
+    return NextResponse.json(formattedCourses);
+  } catch (error) {
+    console.error('Error fetching courses:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+

@@ -1,152 +1,209 @@
 'use client';
-
 import { useAuth } from '@/hooks/useAuth';
+import { UserSchema } from '@/utils/Interfaces';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-
-interface Course {
-  course_id: number;
-  thumbnail: string;
-  title: string;
-  description: string;
-  category: string;
-  price: number;
-}
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { PlusCircle, BookOpen, Users } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import GradualSpacing from '@/components/ui/gradual-spacing';
+import Image from 'next/image';
 
 const CoursePage = () => {
+  const [user, setUser] = useState<UserSchema | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const { isLoggedIn, isLoading, userId, email } = useAuth();
   const router = useRouter();
-  const { userId, email } = useAuth();
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isCourseCreator, setIsCourseCreator] = useState(false);
+
+  // Memoized fetch user profile function
+  const fetchUserProfile = useCallback(async () => {
+    if (!userId || !email) return;
+
+    try {
+      const response = await fetch('/api/user/profile', {
+        method: 'GET',
+        headers: {
+          'X-User-Id': userId,
+          'X-User-Email': email,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch user profile');
+      }
+
+      const userData = await response.json();
+      setUser(userData);
+      setError(null);
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      setError(error instanceof Error ? error.message : 'An unknown error occurred');
+      toast.error('Failed to load user profile');
+    }
+  }, [userId, email]);
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (!userId || !email) {
-        console.error('No userId or email available');
-        toast.error('Authentication required!');
-        router.push('/login');
-        return;
-      }
+    if (isLoggedIn && userId && email && !user) {
+      fetchUserProfile();
+    } else if (!isLoading && !isLoggedIn) {
+      router.push('/login');
+    }
+  }, [isLoggedIn, isLoading, userId, email, router, fetchUserProfile, user]);
 
-      try {
-        console.log('Fetching user profile with:', { userId, email });
-
-        const profileResponse = await fetch('/api/user/profile', {
-          method: 'GET',
-          headers: {
-            'X-User-Id': userId,
-            'X-User-Email': email,
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-        });
-
-        console.log('Profile Response Status:', profileResponse.status);
-
-        if (!profileResponse.ok) {
-          const errorText = await profileResponse.text();
-          console.error('Profile fetch error:', errorText);
-          throw new Error(`Failed to fetch user profile: ${errorText}`);
-        }
-
-        const userData = await profileResponse.json();
-        console.log('User Profile Data:', userData);
-
-        setIsCourseCreator(userData.is_course_creator || false);
-        console.log('Is Course Creator:', userData.is_course_creator);
-
-        if (userData.is_course_creator) {
-          const coursesResponse = await fetch('/api/mycourses', {
-            method: 'GET',
-            headers: {
-              'X-User-Id': userId,
-              'X-User-Email': email,
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-          });
-
-          console.log('Courses Response Status:', coursesResponse.status);
-
-          if (!coursesResponse.ok) {
-            const errorText = await coursesResponse.text();
-            console.error('Courses fetch error:', errorText);
-            throw new Error(`Failed to fetch courses: ${errorText}`);
-          }
-
-          const coursesData = await coursesResponse.json();
-          console.log('Courses Data:', coursesData);
-          setCourses(coursesData.courses || []);
-        }
-
-        setLoading(false);
-      } catch (error: unknown) {
-        const errMsg = error instanceof Error ? error.message : 'Unknown Error~';
-        console.error('Complete Error Object:', errMsg);
-        toast.error(errMsg);
-        setLoading(false);
-      }
-    };
-
-    fetchUserProfile();
-  }, [userId, email, router]);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!isCourseCreator) {
+  if (isLoading) {
     return (
-      <div>
-        <h2>Course Creator Access Required</h2>
-        <p>
-          You need to enable course creator status to view or manage courses.{' '}
-          <a href="/dashboard/settings" className="text-blue-500">
-            Enable Course Creator Status
-          </a>
-        </p>
+      <div className="container mx-auto p-4">
+        <Skeleton className="mb-6 h-12 w-[250px]" />
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(3)].map((_, index) => (
+            <Skeleton key={index} className="h-[200px] w-full" />
+          ))}
+        </div>
       </div>
     );
   }
 
-  if (courses.length === 0) {
+  if (!isLoggedIn) {
     return (
-      <div>
-        <h2>No courses found</h2>
-        <p>
-          You havent published any courses yet.
-          <a href="/dashboard/create-course" className="text-blue-500">
-            Start creating one now!
-          </a>
-        </p>
+      <div className="container mx-auto p-4 text-center">
+        <Card>
+          <CardHeader>
+            <CardTitle>Authentication Required</CardTitle>
+            <CardDescription>Please log in to view your courses.</CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Button onClick={() => router.push('/login')}>Go to Login</Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-4 text-center">
+        <Card>
+          <CardHeader>
+            <CardTitle>Error</CardTitle>
+            <CardDescription>{error}</CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Button onClick={fetchUserProfile}>Retry</Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="container mx-auto p-4">
+        <Skeleton className="mb-6 h-12 w-[250px]" />
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(3)].map((_, index) => (
+            <Skeleton key={index} className="h-[200px] w-full" />
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div>
-      <h1 className="mb-4 text-2xl font-bold">Your Published Courses</h1>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {courses.map((course) => (
-          <div key={course.course_id} className="rounded-lg border p-4 shadow hover:shadow-lg">
-            <img
-              src={course.thumbnail}
-              alt={course.title}
-              className="h-48 w-full rounded-md object-cover"
-            />
-            <h3 className="mt-2 text-lg font-semibold">{course.title}</h3>
-            <p className="text-gray-600">{course.description}</p>
-            <div className="mt-2 text-sm text-gray-500">
-              Category: <span className="font-medium">{course.category}</span>
-            </div>
-            <div className="mt-1 text-sm text-gray-500">
-              Price: <span className="font-medium">₹{course.price}</span>
-            </div>
-          </div>
-        ))}
+    <div className="container mx-auto p-4">
+      <div className="mb-6 flex items-center justify-between">
+        <GradualSpacing
+          className="font-display text-center text-xl font-bold -tracking-widest text-black dark:text-white md:text-3xl"
+          text="Your Published Courses"
+        />
+        {user.is_course_creator && (
+          <Button onClick={() => router.push('/dashboard/create-course')}>
+            <PlusCircle className="mr-2 h-4 w-4" /> Create New Course
+          </Button>
+        )}
       </div>
+      {user.is_course_creator && user.created_courses.length > 0 ? (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {user.created_courses.map(
+            (course: {
+              course_id: number;
+              title: string;
+              description: string;
+              student_count: number;
+            }) => (
+              <Card
+                key={course.course_id}
+                className="flex flex-col hover:-translate-y-2 hover:transition-all hover:delay-75 hover:duration-200"
+              >
+                <CardHeader>
+                  <CardTitle>{course.title}</CardTitle>
+                  <CardDescription>
+                    {course.description || 'No description available'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <Image
+                    src="/r.jpg"
+                    alt={course.title}
+                    className="mb-4 h-40 w-full rounded-md object-cover"
+                  />
+                  <div className="flex items-center text-sm text-gray-500">
+                    <Users className="mr-2 h-4 w-4" />
+                    <span>{course.student_count} students enrolled</span>
+                  </div>
+                </CardContent>
+                <CardFooter className="flex justify-between">
+                  <Button
+                    variant="outline"
+                    onClick={() => router.push(`/course/${course.course_id}`)}
+                  >
+                    <BookOpen className="mr-2 h-4 w-4" /> View Course
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => router.push(`/course/${course.course_id}/edit`)}
+                  >
+                    Edit
+                  </Button>
+                </CardFooter>
+              </Card>
+            ),
+          )}
+        </div>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>No Courses Yet</CardTitle>
+            <CardDescription>
+              {user.is_course_creator
+                ? "You haven't created any courses yet. Start by creating your first course!"
+                : "You're not a course creator yet. Upgrade your account to start creating courses."}
+            </CardDescription>
+          </CardHeader>
+          <CardFooter>
+            {user.is_course_creator ? (
+              <Button onClick={() => router.push('/dashboard/create-course')}>
+                <PlusCircle className="mr-2 h-4 w-4" /> Create Your First Course
+              </Button>
+            ) : (
+              <Button onClick={() => router.push('/upgrade-account')}>
+                Upgrade to Course Creator
+              </Button>
+            )}
+          </CardFooter>
+        </Card>
+      )}
     </div>
   );
 };

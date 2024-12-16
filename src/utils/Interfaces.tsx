@@ -23,3 +23,12 @@ export interface UserSchema {
   created_courses: CreatedCourse[];
   purchased_courses: PurchasedCourse[];
 }
+
+export interface CourseSchema {
+  course_id: string;
+  title: string;
+  description: string;
+  image_url: string;
+  creator_name: string;
+  creator_avatar?: string;
+}
