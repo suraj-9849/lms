@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     const creating_course = await prisma.course.create({
       data: {
         title,
-        description: description || null, 
+        description: description || null,
         category,
         price,
         created_at: new Date(),
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const formattedCourses = courses.map(course => ({
+    const formattedCourses = courses.map((course) => ({
       course_id: course.course_id,
       title: course.title,
       description: course.description,
@@ -78,4 +78,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-

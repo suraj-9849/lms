@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Search, BookOpen } from 'lucide-react';
-import Image from 'next/image';
+import { SafeImage } from '@/components/ui/SafeImage';
 
 export default function DashboardPage() {
   const [user, setUser] = useState<UserSchema | null>(null);
@@ -141,9 +141,11 @@ function CourseCard({ course }: { course: CourseSchema }) {
   return (
     <Card className="flex flex-col overflow-hidden">
       <div className="aspect-video w-full overflow-hidden">
-        <Image
-          src={course.image_url || '/placeholder-course.jpg'}
+        <SafeImage
+          src={'/r.jpg'}
           alt={course.title}
+          width={100}
+          height={100}
           className="h-full w-full object-cover"
         />
       </div>

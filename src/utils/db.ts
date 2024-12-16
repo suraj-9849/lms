@@ -26,7 +26,7 @@ export async function existsOrNot(email: string) {
     const user = await prisma.user.findUnique({
       where: { email },
       select: {
-        user_id:true,
+        user_id: true,
         email: true,
         password: true,
         display_name: true,
