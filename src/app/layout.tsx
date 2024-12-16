@@ -23,10 +23,12 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <ThemeProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
-        <Toaster />
-        <body className={`plus-jakarta-sans antialiased`}>{children}</body>
-      </ThemeProvider>
+      <body className="plus-jakarta-sans antialiased">
+        <ThemeProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
+          <Toaster />
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
