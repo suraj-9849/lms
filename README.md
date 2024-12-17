@@ -3,10 +3,10 @@ The Architecture : ![{6D9230F2-0827-4CD6-8EA1-397DD7542713}](https://github.com/
 Eraser.io : https://app.eraser.io/workspace/jwvgcWIlyoIYtOzbQzcb (The Schema, API's & Services Architecture)
 
 TechStack : 
--- NEXTJS
--- SHADCNUI(UI)
--- Aceternity UI and Magic UI
--- POSTGRESQL
--- PRISMA(ORM)
--- ZOD(Input Validation) ,BcryptJS and JWT
--- Stripe (Payment Gateway)
+- NEXTJS
+- SHADCNUI(UI)
+- Aceternity UI and Magic UI
+- POSTGRESQL
+- PRISMA(ORM)
+- ZOD(Input Validation) ,BcryptJS and JWT
+- Stripe (Payment Gateway)
