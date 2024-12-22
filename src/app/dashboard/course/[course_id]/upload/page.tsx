@@ -83,7 +83,6 @@ export default function UploadPage() {
     ownershipError,
   ]);
 
-  // File handling
   const handleFileUpload = (files: File[]) => {
     if (files.length > 0) {
       setVideoFile(files[0]);
@@ -98,11 +97,18 @@ export default function UploadPage() {
     }
 
     setIsUploading(true);
-
+    if (!userId || !courseId) {
+      console.log('Course ownership check aborted: missing userId or courseId', {
+        userId,
+        courseId,
+      });
+      return;
+    }
     const formData = new FormData();
     formData.append('video', videoFile);
     formData.append('title', videoTitle);
     formData.append('courseId', courseId);
+    formData.append('uploaderId', userId);
 
     try {
       const response = await fetch('/api/upload-video', {
@@ -113,10 +119,11 @@ export default function UploadPage() {
       if (!response.ok) {
         throw new Error('Failed to upload video');
       }
-
+      console.log('Video Uploaded Successfully!');
       toast.success('Video uploaded successfully');
       setVideoFile(null);
       setVideoTitle('');
+      router.push('/dashboard/published-courses');
     } catch (error) {
       console.error('Error uploading video:', error);
       toast.error('Failed to upload video');
@@ -125,7 +132,6 @@ export default function UploadPage() {
     }
   };
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="container mx-auto p-4">

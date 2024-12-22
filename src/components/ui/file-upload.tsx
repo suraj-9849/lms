@@ -110,7 +110,7 @@ export const FileUpload = ({ onChange }: { onChange?: (files: File[]) => void })
                     </motion.p>
 
                     <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} layout>
-                      modified {new Date(file.lastModified).toLocaleDateString()}
+                      {new Date(file.lastModified).toLocaleDateString()}
                     </motion.p>
                   </div>
                 </motion.div>

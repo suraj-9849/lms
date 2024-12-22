@@ -22,6 +22,7 @@ model User {
   is_course_creator Boolean          @default(false)
   created_courses   Course[]         @relation("CreatedCourses")
   purchased_courses CoursePurchase[]
+  uploaded_videos   Video[]          @relation("UploadedVideos")
 }
 
 model Course {
@@ -38,6 +39,7 @@ model Course {
   creator       User             @relation("CreatedCourses", fields: [creator_id], references: [user_id])
   creator_id    String
   purchases     CoursePurchase[]
+  videos        Video[]          @relation("CourseVideos")
 }
 
 model CoursePurchase {
@@ -49,6 +51,20 @@ model CoursePurchase {
   course         Course   @relation(fields: [course_id], references: [course_id])
   course_id      Int
 }
+
+model Video {
+  video_id    String   @id @default(uuid())
+  title       String
+  filename    String
+  size        Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  course      Course   @relation("CourseVideos", fields: [course_id], references: [course_id])
+  course_id   Int
+  uploader    User     @relation("UploadedVideos", fields: [uploader_id], references: [user_id])
+  uploader_id String
+}
+
 
 /// From Eraser.IO :
 
