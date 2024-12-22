@@ -10,3 +10,4 @@ TechStack :
 - PRISMA(ORM)
 - ZOD(Input Validation) ,BcryptJS and JWT
 - Stripe (Payment Gateway)
+- AWS S3 Bucket
