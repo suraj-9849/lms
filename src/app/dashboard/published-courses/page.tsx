@@ -166,15 +166,15 @@ const CoursePage = () => {
                 <CardFooter className="flex justify-between">
                   <Button
                     variant="outline"
-                    onClick={() => router.push(`/course/${course.course_id}`)}
+                    onClick={() => router.push(`/dashboard/course/${course.course_id}`)}
                   >
                     <BookOpen className="mr-2 h-4 w-4" /> View Course
                   </Button>
                   <Button
                     variant="secondary"
-                    onClick={() => router.push(`/course/${course.course_id}/edit`)}
+                    onClick={() => router.push(`/dashboard/course/${course.course_id}/upload`)}
                   >
-                    Edit
+                    Upload
                   </Button>
                 </CardFooter>
               </Card>

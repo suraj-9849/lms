@@ -96,7 +96,7 @@ export default function CreateCoursePage() {
       const newCourse = await createCourseResponse.json();
       console.log(newCourse);
       toast.success('Course created successfully!');
-      router.push(`/dashboard/courses/`);
+      router.push(`/dashboard/published-courses/`);
     } catch (error) {
       console.error('Error creating course:', error);
       toast.error(error instanceof Error ? error.message : 'An unexpected error occurred');
