@@ -1,5 +1,3 @@
-// app/api/view-course/[course_id]/route.ts
-
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';

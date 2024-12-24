@@ -12,41 +12,16 @@ import {
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/useAuth';
-import { UserSchema } from '@/utils/Interfaces';
+import { CourseData, UserSchema } from '@/utils/Interfaces';
 import { useRouter, useParams } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { PlayCircle, Calendar } from 'lucide-react';
 import { SafeImage } from '@/components/ui/SafeImage';
 
-interface Video {
-  video_id: string;
-  title: string;
-  filename: string;
-  created_at: string;
-  size: number;
-}
-
-interface CourseData {
-  course_id: number;
-  title: string;
-  description: string;
-  category: string;
-  price: number;
-  rating: number;
-  video_count: number;
-  student_count: number;
-  thumbnail: string;
-  videos: Video[];
-  creator: {
-    display_name: string;
-    profile_url: string;
-    email: string;
-  };
-}
-
 function DescriptionPage() {
   const [courseData, setCourseData] = useState<CourseData | null>(null);
+  const [isLoadingCourse, setIsLoadingCourse] = useState(true);
   const params = useParams();
   const courseId = params.course_id as string;
   const [user, setUser] = useState<UserSchema | null>(null);
@@ -80,15 +55,10 @@ function DescriptionPage() {
     }
   }, [userId, email]);
 
-  useEffect(() => {
-    if (isLoggedIn && userId && email && !user) {
-      fetchUserProfile();
-    } else if (!isLoading && !isLoggedIn) {
-      router.push('/login');
-    }
-  }, [isLoggedIn, isLoading, userId, email, router, fetchUserProfile, user]);
   const fetchCourseData = useCallback(async () => {
     if (!courseId || !userId || !email) return;
+
+    setIsLoadingCourse(true);
     try {
       const response = await fetch(`/api/view-course/`, {
         method: 'GET',
@@ -110,18 +80,30 @@ function DescriptionPage() {
     } catch (error) {
       console.error('Error fetching course data:', error);
       toast.error('Failed to load course data');
+    } finally {
+      setIsLoadingCourse(false);
     }
-  }, [courseId]);
+  }, [courseId, userId, email]);
 
   useEffect(() => {
-    if (isLoggedIn && courseId) {
-      fetchCourseData();
-    } else if (!isLoading && !isLoggedIn) {
+    if (!isLoading && !isLoggedIn) {
       router.push('/login');
     }
-  }, [isLoggedIn, isLoading, courseId, router, fetchCourseData]);
+  }, [isLoading, isLoggedIn, router]);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (isLoggedIn && userId && email && !user) {
+      fetchUserProfile();
+    }
+  }, [isLoggedIn, userId, email, fetchUserProfile, user]);
+
+  useEffect(() => {
+    if (isLoggedIn && userId && email && courseId) {
+      fetchCourseData();
+    }
+  }, [isLoggedIn, userId, email, courseId, fetchCourseData]);
+
+  if (isLoading || isLoadingCourse) {
     return (
       <div className="container mx-auto p-4">
         <Skeleton className="mb-6 h-8 w-[300px]" />
@@ -133,7 +115,6 @@ function DescriptionPage() {
       </div>
     );
   }
-
   if (!isLoggedIn) {
     return (
       <div className="container mx-auto p-4">

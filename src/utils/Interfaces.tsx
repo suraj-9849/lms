@@ -32,3 +32,30 @@ export interface CourseSchema {
   creator_name: string;
   creator_avatar?: string;
 }
+
+export interface Video {
+  video_id: string;
+  title: string;
+  filename: string;
+  created_at: string;
+  size: number;
+  url?: string | null;
+}
+
+export interface CourseData {
+  course_id: number;
+  title: string;
+  description: string;
+  category: string;
+  price: number;
+  rating: number;
+  video_count: number;
+  student_count: number;
+  thumbnail: string;
+  videos: Video[];
+  creator: {
+    display_name: string;
+    profile_url: string;
+    email: string;
+  };
+}
