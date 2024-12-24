@@ -19,13 +19,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'react-hot-toast';
 
 export default function UploadPage() {
-  // State management
   const [isOwner, setIsOwner] = useState<boolean>(false);
   const [ownershipError, setOwnershipError] = useState<string | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoTitle, setVideoTitle] = useState<string>('');
   const [isUploading, setIsUploading] = useState<boolean>(false);
-
   const { isLoggedIn, isLoading, userId } = useAuth();
   const router = useRouter();
   const params = useParams();
