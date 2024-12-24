@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
     try {
       const command = new PutObjectCommand({
-        Bucket: 'lms',
+        Bucket: process.env.BUCKET_NAME,
         Key: `videos/${fileName}`,
         Body: buffer,
         ContentType: video.type,

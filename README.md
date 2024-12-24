@@ -1,6 +1,8 @@
 Eraser.io : https://app.eraser.io/workspace/jwvgcWIlyoIYtOzbQzcb (The Entity Relationship Diagram and Docs is Present there!)
-TechStack : 
+TechStack :
+
 - NEXTJS
+- TypeScript
 - SHADCNUI(UI)
 - Aceternity UI and Magic UI
 - POSTGRESQL

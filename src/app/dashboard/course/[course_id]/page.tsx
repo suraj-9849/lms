@@ -200,7 +200,13 @@ function DescriptionPage() {
                     <CardDescription>{(video.size / 1024 / 1024).toFixed(2)} MB</CardDescription>
                   </div>
                 </div>
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    router.push(`/dashboard/course/${courseId}/video/${video.video_id}`)
+                  }
+                >
                   Watch Now
                 </Button>
               </div>

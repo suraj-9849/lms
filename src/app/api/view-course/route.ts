@@ -88,7 +88,7 @@ export async function GET(
     const videosWithUrls = await Promise.all(
       courseDetails.videos.map(async (video) => {
         const command = new GetObjectCommand({
-          Bucket: 'lms',
+          Bucket: process.env.BUCKET_NAME,
           Key: `videos/${video.filename}`
         });
 
