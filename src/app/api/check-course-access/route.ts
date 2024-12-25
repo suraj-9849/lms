@@ -36,6 +36,6 @@ export async function GET(req: NextRequest) {
       hasPurchased: Boolean(purchase) 
     });
   } catch (error) {
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    return NextResponse.json({ error: `Server error${error}`, }, { status: 500 });
   }
 }

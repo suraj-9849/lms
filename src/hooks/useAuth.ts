@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
@@ -20,7 +20,7 @@ export function useAuth() {
   });
   const router = useRouter();
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       const response = await fetch('/api/auth/logout', {
         method: 'POST',
@@ -28,13 +28,12 @@ export function useAuth() {
       });
 
       if (response.ok) {
-        setAuthState({
+        setAuthState((prev) => ({
+          ...prev,
           isLoggedIn: false,
-          isLoading: false,
           userId: null,
           email: null,
-          logout,
-        });
+        }));
         toast.success('Logged out successfully');
       } else {
         const errorData = await response.json();
@@ -44,7 +43,7 @@ export function useAuth() {
       console.error('Logout failed:', error);
       toast.error('Failed to log out. Please try again.');
     }
-  };
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -63,32 +62,32 @@ export function useAuth() {
             logout,
           });
         } else {
-          setAuthState({
+          setAuthState((prev) => ({
+            ...prev,
             isLoggedIn: false,
             isLoading: false,
             userId: null,
             email: null,
-            logout,
-          });
+          }));
           toast.error('Authentication failed. Please log in again.');
           router.push('/login');
         }
       } catch (error) {
         console.error('Auth check failed:', error);
-        setAuthState({
+        setAuthState((prev) => ({
+          ...prev,
           isLoggedIn: false,
           isLoading: false,
           userId: null,
           email: null,
-          logout,
-        });
+        }));
         toast.error('An error occurred while checking authentication.');
         router.push('/login');
       }
     };
 
     checkAuth();
-  }, [router]);
+  }, [router, logout]);
 
   return {
     ...authState,

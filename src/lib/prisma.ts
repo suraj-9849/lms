@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { PrismaClient } from '@prisma/client';
 
 let prisma: PrismaClient;
@@ -12,3 +13,4 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 export default prisma;
+/* eslint-enable */

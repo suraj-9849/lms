@@ -8,22 +8,43 @@ import { useEffect, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY!);
+
 interface cd {
   title: string;
   price: number;
 }
+
 export default function PurchasePage() {
   const { course_id: courseId } = useParams();
   const { userId } = useAuth();
-  const [courseData, setCourseData] = useState<cd>();
+  const [courseData, setCourseData] = useState<cd | null>(null);
 
   useEffect(() => {
     const fetchCourse = async () => {
-      const response = await fetch(`/api/getcourse/${courseId}`);
-      const data = await response.json();
-      setCourseData(data);
+      try {
+        const response = await fetch(`/api/getcourse/`, {
+          method: 'GET',
+          headers: {
+            'X-CourseId': courseId?.toString() || '',
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          console.error('Failed to fetch course data:', response.statusText);
+          return;
+        }
+
+        const data = await response.json();
+        setCourseData(data);
+      } catch (error) {
+        console.error('Error fetching course data:', error);
+      }
     };
-    fetchCourse();
+
+    if (courseId) {
+      fetchCourse();
+    }
   }, [courseId]);
 
   const handlePayment = async () => {
@@ -50,7 +71,8 @@ export default function PurchasePage() {
     }
   };
 
-  if (!courseData) return null;
+  if (!courseId) return <div>Loading...</div>;
+  if (!courseData) return <div>Loading course data...</div>;
 
   return (
     <div className="container mx-auto p-4">

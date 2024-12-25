@@ -28,6 +28,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ sessionId: session.id });
   } catch (error) {
-    return NextResponse.json({ error: 'Error creating checkout session' }, { status: 500 });
+    return NextResponse.json({ error: `Error creating checkout session${error}` }, { status: 500 });
   }
 }

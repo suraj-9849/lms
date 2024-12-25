@@ -33,8 +33,9 @@ export async function GET(request: NextRequest) {
     }
 
     console.log('User found:', user.email);
+    /* eslint-disable */
     const { password, ...userWithoutPassword } = user;
-
+    /* eslint-enable */
     return NextResponse.json(userWithoutPassword);
   } catch (error) {
     console.error('Error fetching user profile:', error);
@@ -61,8 +62,9 @@ export async function PUT(request: NextRequest) {
         ...(is_course_creator !== undefined && { is_course_creator }),
       },
     });
+    /* eslint-disable */
     const { password, ...userWithoutPassword } = updatedUser;
-
+    /* eslint-enable */
     return NextResponse.json(userWithoutPassword);
   } catch (error) {
     console.error('Error updating user profile:', error);

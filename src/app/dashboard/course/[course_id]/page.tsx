@@ -85,7 +85,7 @@ function DescriptionPage() {
     } finally {
       setIsLoadingCourse(false);
     }
-  }, [courseId, userId, email]);
+  }, [courseId, userId, email, router]);
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {

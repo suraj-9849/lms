@@ -4,9 +4,15 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { courseId: string } }
 ) {
-  const { courseId } = params;
+  const courseId = request.headers.get('X-CourseId');
+
+  if (!courseId) {
+    return NextResponse.json(
+      { error: 'Course ID is missing in the headers.' },
+      { status: 400 }
+    );
+  }
 
   const parsedCourseId = parseInt(courseId, 10);
 
