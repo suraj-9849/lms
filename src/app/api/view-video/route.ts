@@ -24,18 +24,26 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // First check if user has purchased the course
+    const coursePurchase = await prisma.coursePurchase.findFirst({
+      where: {
+        user_id: userId,
+        course_id: parseInt(courseId),
+        payment_status: true
+      }
+    });
+
+    // Then get video and check if user is creator
     const video = await prisma.video.findUnique({
-      where: { video_id: videoId },
+      where: { 
+        video_id: videoId,
+        course_id: parseInt(courseId) 
+      },
       include: {
         course: {
           select: {
             creator_id: true,
-            purchases: {
-              where: {
-                user_id: userId,
-                payment_status: true
-              }
-            }
+            title: true
           }
         }
       }
@@ -48,14 +56,16 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const hasAccess = video.course.creator_id === userId || 
-                      video.course.purchases.length > 0;
+    const isCreator = video.course.creator_id === userId;
+    const hasPurchased = !!coursePurchase;
 
-    if (!hasAccess) {
-      return NextResponse.json(
-        { error: 'Unauthorized access' },
-        { status: 403 }
-      );
+    if (!isCreator && !hasPurchased) {
+      return NextResponse.json({
+        error: 'Purchase required',
+        courseId: courseId,
+        courseTitle: video.course.title,
+        requiresPurchase: true
+      }, { status: 403 });
     }
 
     const command = new GetObjectCommand({

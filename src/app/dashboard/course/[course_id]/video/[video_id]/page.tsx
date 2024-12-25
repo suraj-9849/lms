@@ -9,16 +9,47 @@ import { useRouter, useParams } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
-function VideoPlayerPage() {
+export default function VideoPlayerPage() {
   const [videoData, setVideoData] = useState<Video | null>(null);
+  const [hasAccess, setHasAccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const params = useParams();
   const videoId = params.video_id as string;
   const courseId = params.course_id as string;
   const { isLoggedIn, userId, email } = useAuth();
   const router = useRouter();
 
+  const checkCourseAccess = useCallback(async () => {
+    if (!userId || !courseId) return;
+
+    try {
+      const response = await fetch('/api/check-course-access', {
+        method: 'GET',
+        headers: {
+          'X-User-Id': userId,
+          'X-Course-Id': courseId,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (data.isCreator || data.hasPurchased) {
+        setHasAccess(true);
+      } else {
+        router.push(`/dashboard/courses/${courseId}/purchase`);
+      }
+    } catch (error) {
+      console.error('Error checking course access:', error);
+      toast.error('Failed to verify course access');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userId, courseId, router]);
+
   const fetchVideoData = useCallback(async () => {
-    if (!videoId || !userId || !email || !courseId) return;
+    if (!videoId || !userId || !email || !courseId || !hasAccess) return;
 
     try {
       const response = await fetch('/api/view-video', {
@@ -43,15 +74,25 @@ function VideoPlayerPage() {
       console.error('Error fetching video data:', error);
       toast.error('Failed to load video');
     }
-  }, [videoId, userId, email, courseId]);
+  }, [videoId, userId, email, courseId, hasAccess]);
 
   useEffect(() => {
-    if (isLoggedIn && videoId) {
+    if (isLoggedIn) {
+      checkCourseAccess();
+    }
+  }, [isLoggedIn, checkCourseAccess]);
+
+  useEffect(() => {
+    if (hasAccess) {
       fetchVideoData();
     }
-  }, [isLoggedIn, videoId, fetchVideoData]);
+  }, [hasAccess, fetchVideoData]);
 
-  if (!isLoggedIn || !videoData || !videoData.url) {
+  if (!isLoggedIn || isLoading) {
+    return <div className="flex min-h-screen items-center justify-center">Loading...</div>;
+  }
+
+  if (!hasAccess) {
     return null;
   }
 
@@ -61,24 +102,24 @@ function VideoPlayerPage() {
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back to Course
       </Button>
-      <Card className="mb-4">
-        <CardHeader>
-          <CardTitle>{videoData.title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <video
-            className="w-full rounded-lg"
-            controls
-            autoPlay
-            controlsList="nodownload"
-            src={videoData.url}
-          >
-            Your browser does not support the video tag.
-          </video>
-        </CardContent>
-      </Card>
+      {videoData && videoData.url && (
+        <Card className="mb-4">
+          <CardHeader>
+            <CardTitle>{videoData.title}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <video
+              className="w-full rounded-lg"
+              controls
+              autoPlay
+              controlsList="nodownload"
+              src={videoData.url}
+            >
+              Your browser does not support the video tag.
+            </video>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
-
-export default VideoPlayerPage;

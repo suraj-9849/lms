@@ -27,6 +27,7 @@
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-tabs": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.1.5",
+    "@stripe/stripe-js": "^5.4.0",
     "@tabler/icons-react": "^3.26.0",
     "@types/bcryptjs": "^2.4.6",
     "axios": "^1.7.9",
@@ -44,6 +45,7 @@
     "react-dom": "^18.0.0",
     "react-dropzone": "^14.3.5",
     "react-hot-toast": "^2.4.1",
+    "stripe": "^17.5.0",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.24.1"

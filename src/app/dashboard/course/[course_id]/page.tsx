@@ -60,7 +60,7 @@ function DescriptionPage() {
 
     setIsLoadingCourse(true);
     try {
-      const response = await fetch(`/api/view-course/`, {
+      const response = await fetch(`/api/view-course`, {
         method: 'GET',
         headers: {
           'X-User-Id': userId,
@@ -76,10 +76,12 @@ function DescriptionPage() {
       }
 
       const data = await response.json();
+      console.log(data);
       setCourseData(data);
     } catch (error) {
       console.error('Error fetching course data:', error);
       toast.error('Failed to load course data');
+      router.push(`/dashboard/course/${courseId}/purchase`);
     } finally {
       setIsLoadingCourse(false);
     }

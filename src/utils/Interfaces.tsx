@@ -3,6 +3,7 @@ export interface PurchasedCourse {
     course_id: string;
     title: string;
     description: string | null;
+    thumbnail: string;
   };
 }
 

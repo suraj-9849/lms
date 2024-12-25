@@ -10,50 +10,64 @@ const s3 = new S3Client({
   credentials: fromEnv(),
 });
 
-export async function GET(
-  req: NextRequest
-) {
+export async function GET(req: NextRequest) {
   try {
     const userId = req.headers.get('x-user-id');
     const userEmail = req.headers.get('x-user-email');
     const course_id = req.headers.get('x-user-courseid');
-    if (!userId || !userEmail||!course_id) {
+
+    console.log('Checking access for:', { userId, courseId: course_id });
+
+    if (!userId || !userEmail || !course_id) {
       return NextResponse.json(
-        { error: 'Unauthorized access' },
+        { error: 'Missing required parameters' },
         { status: 401 }
       );
     }
 
     const courseId = parseInt(course_id);
 
-    if (isNaN(courseId)) {
-      return NextResponse.json(
-        { error: 'Invalid course ID' },
-        { status: 400 }
-      );
-    }
-
-    const purchase = await prisma.coursePurchase.findFirst({
-      where: {
-        course_id: courseId,
-        user_id: userId,
-        payment_status: true
+    // First check if user is the creator
+    const course = await prisma.course.findUnique({
+      where: { course_id: courseId },
+      select: {
+        creator_id: true,
+        title: true,
+        price: true
       }
     });
 
-    const course = await prisma.course.findUnique({
-      where: { course_id: courseId },
-      select: { creator_id: true }
-    });
-
-    if (!purchase && course?.creator_id !== userId) {
-      return NextResponse.json(
-        { error: "You don't have access to this course" },
-        { status: 403 }
-      );
+    if (!course) {
+      return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
-    const courseDetails = await prisma.course.findUnique({
+    console.log('Creator check:', { isCreator: course.creator_id === userId });
+
+    // If not creator, check for purchase
+    if (course.creator_id !== userId) {
+      const purchase = await prisma.coursePurchase.findFirst({
+        where: {
+          course_id: courseId,
+          user_id: userId,
+          payment_status: true
+        }
+      });
+
+      console.log('Purchase check:', { hasPurchase: !!purchase });
+
+      if (!purchase) {
+        return NextResponse.json({
+          error: 'Purchase required',
+          requiresPurchase: true,
+          courseId: courseId,
+          courseTitle: course.title,
+          price: course.price
+        }, { status: 403 });
+      }
+    }
+
+    // Fetch full course details if access is granted
+    const fullCourse = await prisma.course.findUnique({
       where: { course_id: courseId },
       include: {
         videos: {
@@ -78,15 +92,8 @@ export async function GET(
       }
     });
 
-    if (!courseDetails) {
-      return NextResponse.json(
-        { error: 'Course not found' },
-        { status: 404 }
-      );
-    }
-
     const videosWithUrls = await Promise.all(
-      courseDetails.videos.map(async (video) => {
+      fullCourse!.videos.map(async (video) => {
         const command = new GetObjectCommand({
           Bucket: process.env.BUCKET_NAME,
           Key: `videos/${video.filename}`
@@ -94,37 +101,22 @@ export async function GET(
 
         try {
           const presignedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
-          
-          return {
-            ...video,
-            url: presignedUrl
-          };
+          return { ...video, url: presignedUrl };
         } catch (error) {
           console.error(`Error generating presigned URL for video ${video.video_id}:`, error);
-          return {
-            ...video,
-            url: null
-          };
+          return { ...video, url: null };
         }
       })
     );
 
-    const transformedResponse = {
-      ...courseDetails,
+    return NextResponse.json({
+      ...fullCourse,
       videos: videosWithUrls,
-      video_count: courseDetails.videos.length,
-      total_duration: courseDetails.videos.reduce((acc, video) => acc + video.size, 0),
-      last_updated: courseDetails.videos.length > 0
-        ? Math.max(...courseDetails.videos.map(v => new Date(v.updated_at).getTime()))
-        : new Date(courseDetails.created_at).getTime()
-    };
+      video_count: fullCourse!.videos.length
+    });
 
-    return NextResponse.json(transformedResponse);
   } catch (error) {
-    console.error('Error fetching course details:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch course details' },
-      { status: 500 }
-    );
+    console.error('Error:', error);
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

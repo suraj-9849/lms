@@ -19,10 +19,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'react-hot-toast';
 
 export default function UploadPage() {
-  const [isOwner, setIsOwner] = useState<boolean>(false);
+  const [isOwner, setIsOwner] = useState<boolean | null>(null);
   const [ownershipError, setOwnershipError] = useState<string | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoTitle, setVideoTitle] = useState<string>('');
+  const [isCheckingOwnership, setIsCheckingOwnership] = useState<boolean>(true);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const { isLoggedIn, isLoading, userId } = useAuth();
   const router = useRouter();
@@ -37,7 +38,7 @@ export default function UploadPage() {
       });
       return;
     }
-
+    setIsCheckingOwnership(true);
     try {
       const response = await fetch(`/api/course/check-ownership?courseId=${courseId}`, {
         method: 'GET',
@@ -58,6 +59,8 @@ export default function UploadPage() {
       console.error('Error checking course ownership:', error);
       toast.error('Failed to verify course ownership');
       setOwnershipError('Failed to verify course ownership');
+    } finally {
+      setIsCheckingOwnership(false);
     }
   }, [userId, courseId]);
 
@@ -130,7 +133,7 @@ export default function UploadPage() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isCheckingOwnership) {
     return (
       <div className="container mx-auto p-4">
         <Skeleton className="mb-6 h-12 w-[250px]" />

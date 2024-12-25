@@ -254,8 +254,7 @@ export default function ProfilePage() {
                       key={purchase.course.course_id}
                       title={purchase.course.title}
                       description={purchase.course.description || ''}
-                      image="NoImageFor Now!"
-                      progress={0}
+                      image={purchase.course.thumbnail}
                     />
                   ))}
               </div>
