@@ -17,7 +17,7 @@ export function SafeImage({ src, alt, width, height, className }: SafeImageProps
   if (error) {
     return (
       <Image
-        src="./r.jpg"
+        src={src}
         alt={alt}
         width={width || 100}
         height={height || 100}

@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, description, category, price } = body;
+    const { title, description, category, price,thumbnail } = body;
 
     if (!title || !category || price === undefined) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
         price,
         created_at: new Date(),
         creator_id: userId,
+        thumbnail
       },
     });
 
@@ -67,7 +68,7 @@ export async function GET(request: NextRequest) {
       course_id: course.course_id,
       title: course.title,
       description: course.description,
-      image_url: course.thumbnail || '/placeholder-course.jpg',
+      image_url: course.thumbnail || '',
       creator_name: course.creator.display_name,
       creator_avatar: course.creator.profile_url,
     }));
@@ -76,5 +77,44 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error fetching courses:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const courseId = request.headers.get('X-course-Id');
+    const userId = request.headers.get('X-User-Id');
+    console.log(courseId,userId)
+    if (!userId || !courseId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const course = await prisma.course.findFirst({
+      where: {
+        course_id: parseInt(courseId),
+        creator_id: userId,
+      },
+    });
+
+    if (!course) {
+      console.log("Course not found or unauthorized");
+      return NextResponse.json({ error: 'Course not found or unauthorized' }, { status: 404 });
+    }
+    await prisma.video.deleteMany({
+      where: {
+        course_id: parseInt(courseId),
+      },
+    });
+    console.log("Video is Deleted!")
+    await prisma.course.delete({
+      where: {
+        course_id: parseInt(courseId),
+      },
+    });
+    console.log("Course Deleted! successfully!")
+
+    return NextResponse.json({ message: 'Course deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting course:', error);
+    return NextResponse.json({ error: 'Failed to delete course' }, { status: 500 });
   }
 }

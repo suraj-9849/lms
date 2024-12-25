@@ -43,7 +43,7 @@ export function Sidebar() {
             <span className="inline-flex h-12 w-12 items-center justify-center text-lg text-gray-400">
               <BookOpen className="h-5 w-5" />
             </span>
-            <span className="text-sm font-medium">Courses</span>
+            <span className="text-sm font-medium">Published Courses</span>
           </Link>
         </li>
         <li>

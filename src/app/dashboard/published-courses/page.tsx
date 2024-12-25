@@ -141,6 +141,7 @@ const CoursePage = () => {
               title: string;
               description: string;
               student_count: number;
+              thumbnail: string;
             }) => (
               <Card
                 key={course.course_id}
@@ -154,7 +155,7 @@ const CoursePage = () => {
                 </CardHeader>
                 <CardContent className="flex-grow">
                   <SafeImage
-                    src="/r.jpg"
+                    src={course.thumbnail}
                     alt={course.title}
                     className="mb-4 h-40 w-full rounded-md object-cover"
                   />

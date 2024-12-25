@@ -10,14 +10,14 @@ interface CourseCardProps {
   students?: number;
 }
 
-export function CourseCard({ title, description, image, progress, students }: CourseCardProps) {
+export function CourseCard({ title, description, image, progress }: CourseCardProps) {
   return (
     <Card className="overflow-hidden">
       <SafeImage
         src={image}
         alt={title}
-        width={200}
-        height={100}
+        width={100}
+        height={50}
         className="h-40 w-full object-cover"
       />
       <CardContent className="p-4">
@@ -30,9 +30,6 @@ export function CourseCard({ title, description, image, progress, students }: Co
             <Progress value={progress} className="w-full" />
             <p className="mt-2 text-sm text-muted-foreground">{progress}% Complete</p>
           </div>
-        )}
-        {students !== undefined && (
-          <p className="text-sm text-muted-foreground">{students} Students Enrolled</p>
         )}
       </CardFooter>
     </Card>

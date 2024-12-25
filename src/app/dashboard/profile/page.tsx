@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { User, Upload, LogOut, Settings } from 'lucide-react';
+import { User, Upload, LogOut, Settings, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -143,10 +143,44 @@ export default function ProfilePage() {
     return <div>Loading user profile...</div>;
   }
 
+  const handleDeleteCourse = async (courseId: number) => {
+    if (!userId || !email || !courseId) return null;
+    try {
+      const response = await fetch(`/api/courses`, {
+        method: 'DELETE',
+        headers: {
+          'X-User-Id': userId || '',
+          'X-User-Email': email || '',
+          'X-course-Id': courseId.toString(),
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete course');
+      }
+
+      setUser((prevUser) => {
+        if (!prevUser) return null;
+        return {
+          ...prevUser,
+          created_courses: prevUser.created_courses.filter(
+            (course) => course.course_id !== courseId, // Removing by Filter!
+          ),
+        };
+      });
+
+      toast.success('Course deleted successfully');
+    } catch (error) {
+      console.error('Error deleting course:', error);
+      toast.error('Failed to delete course');
+    }
+  };
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto">
       <Card className="mx-auto w-full max-w-4xl">
-        <CardContent className="p-6">
+        <CardContent className="p-3">
           <div className="flex items-center justify-between">
             <div className="flex flex-col items-center space-y-4">
               <div className="relative">
@@ -220,28 +254,52 @@ export default function ProfilePage() {
                       key={purchase.course.course_id}
                       title={purchase.course.title}
                       description={purchase.course.description || ''}
-                      image="/placeholder.svg?height=100&width=200"
+                      image="NoImageFor Now!"
                       progress={0}
                     />
                   ))}
               </div>
             </TabsContent>
-            {user.is_course_creator && (
-              <TabsContent value="published">
-                <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {user.created_courses &&
-                    user.created_courses.map((course) => (
+            <TabsContent value="published">
+              <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {user.created_courses &&
+                  user.created_courses.map((course) => (
+                    <div key={course.course_id} className="relative">
                       <CourseCard
-                        key={course.course_id}
                         title={course.title}
                         description={course.description || ''}
-                        image="r.jpg"
-                        students={course.student_count}
+                        image={course.thumbnail}
                       />
-                    ))}
-                </div>
-              </TabsContent>
-            )}
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            className="absolute right-2 top-2"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Course</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete {course.title}? This action cannot be
+                              undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeleteCourse(course.course_id)}>
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  ))}
+              </div>
+            </TabsContent>
           </Tabs>
         </CardContent>
       </Card>

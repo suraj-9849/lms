@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus } from 'lucide-react';
+import { BookOpen, DollarSign, Plus, Tag, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,12 +9,16 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { filetoDataURL } from 'image-conversion';
+import { FileUpload } from '@/components/ui/file-upload';
+import { SafeImage } from '@/components/ui/SafeImage';
 
 interface CourseFormData {
   title: string;
-  description?: string;
+  description: string;
   category: string;
   price: number;
+  thumbnail: string;
 }
 
 export default function CreateCoursePage() {
@@ -25,6 +29,7 @@ export default function CreateCoursePage() {
     description: '',
     category: '',
     price: 0,
+    thumbnail: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -34,6 +39,19 @@ export default function CreateCoursePage() {
       ...prev,
       [name]: name === 'price' ? parseFloat(value) : value,
     }));
+  };
+
+  const handleFileUpload = async (files: File[]) => {
+    if (files.length > 0) {
+      const file = files[0];
+      try {
+        const thumbnailUrl = await filetoDataURL(file);
+        setFormData((prev) => ({ ...prev, thumbnail: thumbnailUrl }));
+      } catch (error) {
+        console.error('Error converting thumbnail:', error);
+        toast.error('Failed to process thumbnail image');
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -114,67 +132,107 @@ export default function CreateCoursePage() {
   }
 
   return (
-    <div className="container mx-auto py-10">
-      <Card className="mx-auto w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle className="flex items-center">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <Card className="mx-auto w-full max-w-4xl">
+        <CardHeader className="bg-primary text-primary-foreground">
+          <CardTitle className="flex items-center text-xl font-bold">
             <Plus className="mr-2 h-6 w-6" />
             Create New Course
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="title">Course Title</Label>
-              <Input
-                id="title"
-                name="title"
-                placeholder="Enter course title"
-                value={formData.title}
-                onChange={handleInputChange}
-                required
-              />
+        <CardContent className="mt-6">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="title" className="text-lg font-medium">
+                    <BookOpen className="mr-2 inline h-5 w-5" />
+                    Course Title
+                  </Label>
+                  <Input
+                    id="title"
+                    name="title"
+                    placeholder="Enter course title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    required
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="category" className="text-lg font-medium">
+                    <Tag className="mr-2 inline h-5 w-5" />
+                    Category
+                  </Label>
+                  <Input
+                    id="category"
+                    name="category"
+                    placeholder="Enter course category"
+                    value={formData.category}
+                    onChange={handleInputChange}
+                    required
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="price" className="text-lg font-medium">
+                    <DollarSign className="mr-2 inline h-5 w-5" />
+                    Price (in USD)
+                  </Label>
+                  <Input
+                    id="price"
+                    name="price"
+                    type="number"
+                    placeholder="Course price"
+                    value={formData.price}
+                    onChange={handleInputChange}
+                    min="0"
+                    step="0.01"
+                    required
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="description" className="text-lg font-medium">
+                    Course Description
+                  </Label>
+                  <Textarea
+                    id="description"
+                    name="description"
+                    placeholder="Provide a brief description of your course"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    className="mt-1 h-32"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="videoFile" className="text-lg font-medium">
+                    <Upload className="mr-2 inline h-5 w-5" />
+                    Thumbnail
+                  </Label>
+                  <FileUpload onChange={handleFileUpload} />
+                </div>
+                {formData.thumbnail && (
+                  <div className="mt-4">
+                    <Label className="text-lg font-medium">Thumbnail Preview</Label>
+                    <div className="mt-2 aspect-video w-full overflow-hidden rounded-lg">
+                      <SafeImage
+                        src={formData.thumbnail}
+                        alt="Thumbnail preview"
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="description">Course Description (Optional)</Label>
-              <Textarea
-                id="description"
-                name="description"
-                placeholder="Provide a brief description of your course"
-                value={formData.description}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              <Input
-                id="category"
-                name="category"
-                placeholder="Enter course category"
-                value={formData.category}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="price">Price (in USD)</Label>
-              <Input
-                id="price"
-                name="price"
-                type="number"
-                placeholder="Course price"
-                value={formData.price}
-                onChange={handleInputChange}
-                min="0"
-                step="0.01"
-                required
-              />
-            </div>
-
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button type="submit" className="h-12 w-full text-lg" disabled={isSubmitting}>
               {isSubmitting ? 'Creating Course...' : 'Create Course'}
             </Button>
           </form>

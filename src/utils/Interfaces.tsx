@@ -11,6 +11,7 @@ export interface CreatedCourse {
   title: string;
   description: string;
   student_count: number;
+  thumbnail: string;
 }
 
 export interface UserSchema {
@@ -31,6 +32,7 @@ export interface CourseSchema {
   image_url: string;
   creator_name: string;
   creator_avatar?: string;
+  thumbnail: string;
 }
 
 export interface Video {

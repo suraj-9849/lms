@@ -138,11 +138,12 @@ export default function DashboardPage() {
 }
 
 function CourseCard({ course }: { course: CourseSchema }) {
+  const router = useRouter();
   return (
     <Card className="flex flex-col overflow-hidden">
       <div className="aspect-video w-full overflow-hidden">
         <SafeImage
-          src={'/r.jpg'}
+          src={course.image_url}
           alt={course.title}
           width={100}
           height={100}
@@ -163,9 +164,11 @@ function CourseCard({ course }: { course: CourseSchema }) {
           </Avatar>
           <span className="text-sm text-gray-500">{course.creator_name}</span>
         </div>
-        <Button variant="outline" size="sm">
-          <BookOpen className="mr-2 h-4 w-4" />
-          View Course
+        <Button
+          variant="outline"
+          onClick={() => router.push(`/dashboard/course/${course.course_id}`)}
+        >
+          <BookOpen className="mr-2 h-4 w-4" /> View Course
         </Button>
       </CardFooter>
     </Card>
