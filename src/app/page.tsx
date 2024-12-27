@@ -51,7 +51,7 @@ export default function Home() {
 
               <div className="mt-8 flex justify-center gap-4">
                 <Button size="lg" className="bg-blue-600 text-white hover:bg-blue-700">
-                  Get Started
+                  <Link href={'/login'}>Get Started </Link>
                 </Button>
                 <Button
                   size="lg"

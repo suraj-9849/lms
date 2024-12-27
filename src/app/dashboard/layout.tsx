@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="plus-jakarta-sans">
+    <div className="plus-jakarta-sans" id="scroll">
       <div className="flex h-screen">
         <Sidebar />
         <div className="flex flex-1 flex-col overflow-hidden">

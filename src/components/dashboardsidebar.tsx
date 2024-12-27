@@ -59,13 +59,13 @@ export function Sidebar() {
         </li>
         <li>
           <Link
-            href="/dashboard/students"
+            href="/dashboard/purchased-courses"
             className="flex h-12 transform flex-row items-center text-gray-500 transition-transform duration-200 ease-in hover:translate-x-2 hover:text-gray-200"
           >
             <span className="inline-flex h-12 w-12 items-center justify-center text-lg text-gray-400">
               <Users className="h-5 w-5" />
             </span>
-            <span className="text-sm font-medium">Students</span>
+            <span className="text-sm font-medium">Purchased Courses</span>
           </Link>
         </li>
         <li>
