@@ -37,8 +37,8 @@ export async function GET(req: NextRequest) {
       // If it is success then we will redirect him to the respected course he want to purchase: by using the redirect()
       return NextResponse.redirect(`${baseUrl}/dashboard/course/${courseId}`);
     }
-  } catch (error) {
-    // console.error('Payment verification error:', error);
+  } catch (error:unknown) {
+    console.error('Payment verification error:', error);
   }
 // If it is not successfully then sending back th /dashboard page!
   return NextResponse.redirect(`${baseUrl}/dashboard`);

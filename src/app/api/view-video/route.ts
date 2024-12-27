@@ -80,8 +80,8 @@ export async function GET(req: NextRequest) {
       ...video,
       url: presignedUrl
     });
-  } catch (error) {
-    // console.error('Error fetching video:', error);
+  } catch (error:unknown) {
+    console.error('Error fetching video:', error);
     return NextResponse.json(
       { error: 'Failed to fetch video' },
       { status: 500 }

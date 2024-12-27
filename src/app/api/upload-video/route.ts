@@ -50,8 +50,8 @@ export async function POST(req: NextRequest) {
       });
 
       await s3.send(command);
-    } catch (s3Error) {
-      // console.error('Error in uploading to S3:', s3Error);
+    } catch (s3Error:unknown) {
+      console.error('Error in uploading to S3:', s3Error);
       return NextResponse.json(
         { error: 'Failed! please try again.' },
         { status: 500 },
@@ -76,8 +76,8 @@ export async function POST(req: NextRequest) {
         where: { course_id: parseInt(courseId) },
         data: { video_count: { increment: 1 } },
       });
-    } catch (error) {
-      // console.error('error saving to database:', error);
+    } catch (error:unknown) {
+      console.error('error saving to database:', error);
       return NextResponse.json(
         { error: 'failed to save video details to the database.' },
         { status: 500 },
@@ -89,8 +89,8 @@ export async function POST(req: NextRequest) {
       video: newVideo,
       course: updatedCourse,
     });
-  } catch (error) {
-    // console.error('Unexpected error:', error);
+  } catch (error:unknown) {
+    console.error('Unexpected error:', error);
     return NextResponse.json(
       { error: 'please try again.' },
       { status: 500 },

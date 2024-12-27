@@ -52,8 +52,8 @@ export async function POST(request: NextRequest) {
     // console.log('Token set in cookie:', token);
 
     return response;
-  } catch (error) {
-    // console.error('Error:', error);
+  } catch (error:unknown) {
+    console.error('Error:', error);
     return NextResponse.json({ msg: 'error' }, { status: 500 });
   }
 }

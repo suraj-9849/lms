@@ -37,8 +37,8 @@ export function middleware(request: NextRequest) {
         headers: requestHeaders,
       },
     });
-  } catch (error) {
-    // console.error('Middleware - Token verification error:', error);
+  } catch (error:unknown) {
+    console.error('Middleware - Token verification error:', error);
     return NextResponse.redirect(new URL('/login', request.url));
   }
 }

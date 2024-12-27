@@ -15,8 +15,8 @@ export async function createUserInDb(email: string, displayName: string, hashedP
       },
     });
     return newUser;
-  } catch (error) {
-    // console.error('Error:', error);
+  } catch (error:unknown) {
+    console.error('Error:', error);
     return null;
   }
 }
@@ -33,8 +33,8 @@ export async function existsOrNot(email: string) {
       },
     });
     return user;
-  } catch (error) {
-    // console.error('Error:', error);
+  } catch (error:unknown) {
+    console.error('Error:', error);
     return null;
   }
 }

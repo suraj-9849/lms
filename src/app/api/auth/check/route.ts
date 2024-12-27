@@ -26,8 +26,8 @@ export async function GET(request: NextRequest) {
       userId: decoded.userId,
       email: decoded.email,
     });
-  } catch (error) {
-    // console.error('Token verification error:', error);
+  } catch (error:unknown) {
+    console.error('Token verification error:', error);
     return NextResponse.json(
       { isAuthenticated: false, userId: null, error: 'Invalid token' },
       { status: 401 },

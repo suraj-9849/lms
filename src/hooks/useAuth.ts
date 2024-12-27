@@ -33,8 +33,8 @@ export function useAuth() {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Logout failed');
       }
-    } catch (error) {
-      // console.error('Logout failed:', error);
+    } catch (error:unknown) {
+      console.error('Logout failed:', error);
       toast.error('Failed to log out. Please try again.');
     }
   }, []);
@@ -67,8 +67,8 @@ export function useAuth() {
           toast.error('Authentication failed. Please log in again.');
           router.push('/login');
         }
-      } catch (error) {
-        // console.error('Auth check failed:', error);
+      } catch (error:unknown) {
+        console.error('Auth check failed:', error);
         setAuthState((prev) => ({
           ...prev,
           isLoggedIn: false,

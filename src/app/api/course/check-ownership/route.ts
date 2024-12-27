@@ -48,8 +48,8 @@ export async function GET(req: NextRequest) {
       // console.log('User does not own this course')
       return NextResponse.json({ isOwner: false, reason: 'User does not own this course' })
     }
-  } catch (error) {
-    // console.error('Error checking course ownership:', error)
+  } catch (error:unknown) {
+    console.error('Error checking course ownership:', error)
     return NextResponse.json({ error: 'Failed to check course ownership' }, { status: 500 })
   }
 }

@@ -106,8 +106,8 @@ export async function GET(req: NextRequest) {
           const presignedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
           //  putting the presignedURL into the videoWithURLS:
           return { ...video, url: presignedUrl };
-        } catch (error) {
-          // console.error(`Error generating presigned URL for video ${video.video_id}:`, error);
+        } catch (error:unknown) {
+          console.error(`Error generating presigned URL for video ${video.video_id}:`, error);
           return { ...video, url: null };
         }
       })
@@ -119,8 +119,8 @@ export async function GET(req: NextRequest) {
       video_count: fullCourse!.videos.length
     });
 
-  } catch (error) {
-    // console.error('Error:', error);
+  } catch (error:unknown) {
+    console.error('Error:', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

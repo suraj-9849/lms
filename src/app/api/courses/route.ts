@@ -41,8 +41,8 @@ export async function POST(request: NextRequest) {
     });
     // Resing the response to Frontend
     return NextResponse.json({ course: creating_course });
-  } catch (error) {
-    // console.error('Error creating course:', error);
+  } catch (error:unknown) {
+    console.error('Error creating course:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -81,8 +81,8 @@ export async function GET(request: NextRequest) {
     }));
 //  Retuning the formatted Data:
     return NextResponse.json(formattedCourses);
-  } catch (error) {
-    // console.error('Error fetching courses:', error);
+  } catch (error:unknown) {
+    console.error('Error fetching courses:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -126,8 +126,8 @@ export async function DELETE(request: NextRequest) {
     // console.log("Course Deleted! successfully!")
 //  Success MSG:
     return NextResponse.json({ message: 'Course deleted successfully' });
-  } catch (error) {
-    // console.error('Error deleting course:', error);
+  } catch (error:unknown) {
+    console.error('Error deleting course:', error);
     return NextResponse.json({ error: 'Failed to delete course' }, { status: 500 });
   }
 }

@@ -55,8 +55,8 @@ export async function GET(
       purchasedCourses,
       createdCourses,
     })
-  } catch (error) {
-    // console.error('Error fetching user courses:', error)
+  } catch (error:unknown) {
+    console.error('Error fetching user courses:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

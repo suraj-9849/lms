@@ -37,8 +37,8 @@ export async function POST(request: NextRequest) {
 
     //  Success Response is sent Back to the Frontend!
     return NextResponse.json({ msg: 'User created successfully', user: newUser }, { status: 201 });
-  } catch (error) {
-    // console.error('Error creating user:', error);
+  } catch (error:unknown) {
+    console.error('Error creating user:', error);
     return NextResponse.json({ msg: 'error' }, { status: 500 });
   }
 }

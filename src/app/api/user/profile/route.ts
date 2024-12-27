@@ -41,8 +41,8 @@ export async function GET(request: NextRequest) {
     /* eslint-enable */
     // sending the details
     return NextResponse.json(userWithoutPassword);
-  } catch (error) {
-    // console.error('Error fetching user profile:', error);
+  } catch (error:unknown) {
+    console.error('Error fetching user profile:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -78,8 +78,8 @@ export async function PUT(request: NextRequest) {
     /* eslint-enable */
     // sending back the data to the frontend
     return NextResponse.json(userWithoutPassword);
-  } catch (error) {
-    // console.error('Error updating user profile:', error);
+  } catch (error:unknown) {
+    console.error('Error updating user profile:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
