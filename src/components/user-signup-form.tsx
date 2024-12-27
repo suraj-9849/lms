@@ -27,7 +27,7 @@ export function UserSignUpForm({ className, ...props }: React.HTMLAttributes<HTM
     };
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/signup`, {
+      const response = await fetch(`/api/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
