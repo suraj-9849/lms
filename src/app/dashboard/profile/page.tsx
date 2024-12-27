@@ -52,7 +52,7 @@ export default function ProfilePage() {
       setUser(userData);
       setError(null);
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      // console.error('Error fetching user profile:', error);
       setError(error instanceof Error ? error.message : 'An unknown error occurred');
       toast.error('Failed to load user profile');
     }
@@ -89,7 +89,7 @@ export default function ProfilePage() {
           const updatedUser = await response.json();
           setUser(updatedUser);
           toast.success('Profile image updated successfully');
-        } catch (error) {
+        } catch (error: unknown) {
           console.error('Error updating profile image:', error);
           toast.error('Failed to update profile image');
         }
@@ -116,7 +116,7 @@ export default function ProfilePage() {
       const updatedUser = await response.json();
       setUser(updatedUser);
       toast.success(`You are now ${isCourseCreator ? 'a course creator' : 'a student'}`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error updating role:', error);
       toast.error('Failed to update role');
     }
@@ -172,7 +172,7 @@ export default function ProfilePage() {
       });
 
       toast.success('Course deleted successfully');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error deleting course:', error);
       toast.error('Failed to delete course');
     }

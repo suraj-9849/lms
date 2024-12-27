@@ -45,6 +45,14 @@ export interface Video {
   url?: string | null;
 }
 
+export interface AuthState {
+  isLoggedIn: boolean;
+  isLoading: boolean;
+  userId: string | null;
+  email: string | null;
+  logout: () => Promise<void>;
+}
+
 export interface CourseData {
   course_id: number;
   title: string;

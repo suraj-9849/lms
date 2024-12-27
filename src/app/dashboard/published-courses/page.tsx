@@ -48,7 +48,7 @@ const CoursePage = () => {
       setUser(userData);
       setError(null);
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      // console.error('Error fetching user profile:', error);
       setError(error instanceof Error ? error.message : 'An unknown error occurred');
       toast.error('Failed to load user profile');
     }

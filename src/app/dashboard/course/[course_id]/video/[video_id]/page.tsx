@@ -6,8 +6,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { Video } from '@/utils/Interfaces';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
-import React, { useCallback, useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
+import React, { useCallback, useEffect, useState } from 'react'; //useCallback: memoizing a function. // useEffect:to perform side effects(fetch). // useState:for state
+import toast from 'react-hot-toast'; // showing the response to the user .success,.error
 
 export default function VideoPlayerPage() {
   const [videoData, setVideoData] = useState<Video | null>(null);
@@ -38,9 +38,10 @@ export default function VideoPlayerPage() {
       if (data.isCreator || data.hasPurchased) {
         setHasAccess(true);
       } else {
+        //  If not purchased:
         router.push(`/dashboard/courses/${courseId}/purchase`);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error checking course access:', error);
       toast.error('Failed to verify course access');
     } finally {
@@ -70,7 +71,7 @@ export default function VideoPlayerPage() {
 
       const data = await response.json();
       setVideoData(data);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching video data:', error);
       toast.error('Failed to load video');
     }

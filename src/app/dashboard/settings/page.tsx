@@ -49,7 +49,7 @@ function Page() {
       setUser(userData);
       setError(null);
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      // console.error('Error fetching user profile:', error);
       setError(error instanceof Error ? error.message : 'An unknown error occurred');
       toast.error('Failed to load user profile');
     }
@@ -108,7 +108,7 @@ function Page() {
       });
 
       toast.success('Course deleted successfully');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error deleting course:', error);
       toast.error('Failed to delete course');
     }

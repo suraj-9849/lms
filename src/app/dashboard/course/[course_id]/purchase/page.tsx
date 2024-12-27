@@ -15,8 +15,8 @@ interface cd {
 }
 
 export default function PurchasePage() {
-  const { course_id: courseId } = useParams();
-  const { userId } = useAuth();
+  const { course_id: courseId } = useParams(); // Getting the courseID through Params:
+  const { userId } = useAuth(); // Use AuthHook
   const [courseData, setCourseData] = useState<cd | null>(null);
 
   useEffect(() => {
@@ -31,13 +31,13 @@ export default function PurchasePage() {
         });
 
         if (!response.ok) {
-          console.error('Failed to fetch course data:', response.statusText);
+          // console.error('Failed to fetch course data:', response.statusText);
           return;
         }
 
         const data = await response.json();
         setCourseData(data);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error fetching course data:', error);
       }
     };
@@ -66,7 +66,7 @@ export default function PurchasePage() {
       const { sessionId } = await response.json();
       const stripe = await stripePromise;
       await stripe?.redirectToCheckout({ sessionId });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Payment error:', error);
     }
   };

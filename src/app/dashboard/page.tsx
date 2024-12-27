@@ -59,7 +59,7 @@ export default function DashboardPage() {
       setFilteredCourses(coursesData);
       setError(null);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      // console.error('Error fetching data:', error);
       setError(error instanceof Error ? error.message : 'An unknown error occurred');
       toast.error('Failed to load data');
     }

@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/components/ui/skeleton'; // shows the skeleton:
 import { useAuth } from '@/hooks/useAuth';
 import { CourseData, UserSchema } from '@/utils/Interfaces';
 import { useRouter, useParams } from 'next/navigation';
@@ -49,7 +49,7 @@ function DescriptionPage() {
 
       const userData = await response.json();
       setUser(userData);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching user profile:', error);
       toast.error('Failed to load user profile');
     }
@@ -76,9 +76,9 @@ function DescriptionPage() {
       }
 
       const data = await response.json();
-      console.log(data);
+      // console.log(data);
       setCourseData(data);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching course data:', error);
       toast.error('Failed to load course data');
       router.push(`/dashboard/course/${courseId}/purchase`);

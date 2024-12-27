@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { fromEnv } from '@aws-sdk/credential-providers';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';//AWS s3
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'; // Converting into URL:
+import { fromEnv } from '@aws-sdk/credential-providers'; //.env details:
 
 const s3 = new S3Client({
   region: 'auto',
@@ -12,19 +12,20 @@ const s3 = new S3Client({
 
 export async function GET(req: NextRequest) {
   try {
+    // Getting values from the frontend in the form of Headers:
     const userId = req.headers.get('x-user-id');
     const userEmail = req.headers.get('x-user-email');
     const course_id = req.headers.get('x-user-courseid');
 
-    console.log('Checking access for:', { userId, courseId: course_id });
-
+    // console.log('Checking access for:', { userId, courseId: course_id });
+// Missing:
     if (!userId || !userEmail || !course_id) {
       return NextResponse.json(
         { error: 'Missing required parameters' },
         { status: 401 }
       );
     }
-
+// Parsing:
     const courseId = parseInt(course_id);
 
     // First check if user is the creator
@@ -41,7 +42,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
-    console.log('Creator check:', { isCreator: course.creator_id === userId });
+    // console.log('Creator check:', { isCreator: course.creator_id === userId });
 
     // If not creator, check for purchase
     if (course.creator_id !== userId) {
@@ -53,7 +54,7 @@ export async function GET(req: NextRequest) {
         }
       });
 
-      console.log('Purchase check:', { hasPurchase: !!purchase });
+      // console.log('Purchase check:', { hasPurchase: !!purchase });
 
       if (!purchase) {
         return NextResponse.json({
@@ -91,24 +92,27 @@ export async function GET(req: NextRequest) {
         }
       }
     });
-
+//  the videosWithURLS does 2 operations:
     const videosWithUrls = await Promise.all(
       fullCourse!.videos.map(async (video) => {
+        // 1. Getting the Video from the AWS s3 bucket
         const command = new GetObjectCommand({
           Bucket: process.env.BUCKET_NAME,
           Key: `videos/${video.filename}`
         });
 
         try {
+          //  Using the getSignedURL provided by the aws to convert the command(video) into the url: 
           const presignedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
+          //  putting the presignedURL into the videoWithURLS:
           return { ...video, url: presignedUrl };
         } catch (error) {
-          console.error(`Error generating presigned URL for video ${video.video_id}:`, error);
+          // console.error(`Error generating presigned URL for video ${video.video_id}:`, error);
           return { ...video, url: null };
         }
       })
     );
-
+//  Returning the data:
     return NextResponse.json({
       ...fullCourse,
       videos: videosWithUrls,
@@ -116,7 +120,7 @@ export async function GET(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error:', error);
+    // console.error('Error:', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

@@ -39,7 +39,7 @@ function PurchasedCourses() {
         const data = await response.json();
         setPurchasedCourses(data.purchasedCourses);
         setCreatedCourses(data.createdCourses);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error fetching courses:', error);
       } finally {
         setIsLoading(false);

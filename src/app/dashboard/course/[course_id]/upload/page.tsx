@@ -32,10 +32,10 @@ export default function UploadPage() {
 
   const checkCourseOwnership = useCallback(async () => {
     if (!userId || !courseId) {
-      console.log('Course ownership check aborted: missing userId or courseId', {
-        userId,
-        courseId,
-      });
+      // console.log('Course ownership check aborted: missing userId or courseId', {
+      //   userId,
+      //   courseId,
+      // });
       return;
     }
     setIsCheckingOwnership(true);
@@ -55,7 +55,7 @@ export default function UploadPage() {
       const data = await response.json();
       setIsOwner(data.isOwner);
       setOwnershipError(data.isOwner ? null : data.reason);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error checking course ownership:', error);
       toast.error('Failed to verify course ownership');
       setOwnershipError('Failed to verify course ownership');
@@ -99,10 +99,10 @@ export default function UploadPage() {
 
     setIsUploading(true);
     if (!userId || !courseId) {
-      console.log('Course ownership check aborted: missing userId or courseId', {
-        userId,
-        courseId,
-      });
+      // console.log('Course ownership check aborted: missing userId or courseId', {
+      //   userId,
+      //   courseId,
+      // });
       return;
     }
     const formData = new FormData();
@@ -120,12 +120,12 @@ export default function UploadPage() {
       if (!response.ok) {
         throw new Error('Failed to upload video');
       }
-      console.log('Video Uploaded Successfully!');
+      // console.log('Video Uploaded Successfully!');
       toast.success('Video uploaded successfully');
       setVideoFile(null);
       setVideoTitle('');
       router.push('/dashboard/published-courses');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error uploading video:', error);
       toast.error('Failed to upload video');
     } finally {

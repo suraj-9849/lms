@@ -12,11 +12,12 @@ const s3 = new S3Client({
 
 export async function GET(req: NextRequest) {
   try {
+    //  Getting the Headers:
     const userId = req.headers.get('x-user-id');
     const userEmail = req.headers.get('x-user-email');
     const videoId = req.headers.get('x-video-id');
     const courseId = req.headers.get('x-course-id');
-
+// MIssing:
     if (!userId || !userEmail || !videoId || !courseId) {
       return NextResponse.json(
         { error: 'Missing required parameters' },
@@ -55,10 +56,10 @@ export async function GET(req: NextRequest) {
         { status: 404 }
       );
     }
-
+// If the user is the courseCreator
     const isCreator = video.course.creator_id === userId;
     const hasPurchased = !!coursePurchase;
-
+// Not purchased:
     if (!isCreator && !hasPurchased) {
       return NextResponse.json({
         error: 'Purchase required',
@@ -67,7 +68,7 @@ export async function GET(req: NextRequest) {
         requiresPurchase: true
       }, { status: 403 });
     }
-
+// Getting the video:
     const command = new GetObjectCommand({
       Bucket: process.env.BUCKET_NAME,
       Key: `videos/${video.filename}`
@@ -80,7 +81,7 @@ export async function GET(req: NextRequest) {
       url: presignedUrl
     });
   } catch (error) {
-    console.error('Error fetching video:', error);
+    // console.error('Error fetching video:', error);
     return NextResponse.json(
       { error: 'Failed to fetch video' },
       { status: 500 }

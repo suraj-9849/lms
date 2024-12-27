@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { filetoDataURL } from 'image-conversion';
+import { filetoDataURL } from 'image-conversion'; // Converting the image into the url
 import { FileUpload } from '@/components/ui/file-upload';
 import { SafeImage } from '@/components/ui/SafeImage';
 
@@ -32,7 +32,7 @@ export default function CreateCoursePage() {
     thumbnail: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  // React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> : event type for the onChange Event:
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -40,29 +40,29 @@ export default function CreateCoursePage() {
       [name]: name === 'price' ? parseFloat(value) : value,
     }));
   };
-
+  // from aceternity UI:
   const handleFileUpload = async (files: File[]) => {
     if (files.length > 0) {
       const file = files[0];
       try {
         const thumbnailUrl = await filetoDataURL(file);
         setFormData((prev) => ({ ...prev, thumbnail: thumbnailUrl }));
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error converting thumbnail:', error);
         toast.error('Failed to process thumbnail image');
       }
     }
   };
-
+  //  FormEvent -> Types for the form event:
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    // Not LoggedIn
     if (!isLoggedIn) {
       toast.error('You must be logged in to create a course');
       router.push('/login');
       return;
     }
-
+    // MIssing:
     if (!formData.title || !formData.category) {
       toast.error('Please fill in all required fields');
       return;
@@ -116,7 +116,7 @@ export default function CreateCoursePage() {
       toast.success('Course created successfully!');
       router.push(`/dashboard/published-courses/`);
     } catch (error) {
-      console.error('Error creating course:', error);
+      // console.error('Error creating course:', error);
       toast.error(error instanceof Error ? error.message : 'An unexpected error occurred');
     } finally {
       setIsSubmitting(false);

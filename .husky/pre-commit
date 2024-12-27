@@ -1,3 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
+# This is used to run the lint-staged when ever we are pushing the code to github: .lintstagedrc.json
 npx lint-staged

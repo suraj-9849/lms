@@ -7,7 +7,7 @@ export async function updateUserProfileImage(userId: string, imageUrl: string) {
       data: { profile_url: imageUrl },
     });
     return updatedUser;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating user profile image:', error);
     throw new Error('Failed to update user profile image');
   }
@@ -29,7 +29,7 @@ export async function purchaseCourse(userId: string, courseId: number) {
     });
 
     return purchase;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error purchasing course:', error);
     throw new Error('Failed to purchase course');
   }
@@ -42,7 +42,7 @@ export async function updateInstructorStatus(userId: string, isInstructor: boole
       data: { is_course_creator: isInstructor },
     });
     return updatedUser;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating instructor status:', error);
     throw new Error('Failed to update instructor status');
   }
@@ -55,7 +55,7 @@ export async function getUserPurchasedCourses(userId: string) {
       include: { course: true },
     });
     return purchasedCourses;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching user purchased courses:', error);
     throw new Error('Failed to fetch user purchased courses');
   }
@@ -67,7 +67,7 @@ export async function getUserCreatedCourses(userId: string) {
       where: { creator_id: userId },
     });
     return createdCourses;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching user created courses:', error);
     throw new Error('Failed to fetch user created courses');
   }

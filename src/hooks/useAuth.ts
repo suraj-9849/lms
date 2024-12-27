@@ -1,14 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { AuthState } from '@/utils/Interfaces';
 
-interface AuthState {
-  isLoggedIn: boolean;
-  isLoading: boolean;
-  userId: string | null;
-  email: string | null;
-  logout: () => Promise<void>;
-}
 
 export function useAuth() {
   const [authState, setAuthState] = useState<AuthState>({
@@ -40,7 +34,7 @@ export function useAuth() {
         throw new Error(errorData.error || 'Logout failed');
       }
     } catch (error) {
-      console.error('Logout failed:', error);
+      // console.error('Logout failed:', error);
       toast.error('Failed to log out. Please try again.');
     }
   }, []);
@@ -48,6 +42,7 @@ export function useAuth() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        // This route helps t
         const response = await fetch('/api/auth/check', {
           credentials: 'include',
         });
@@ -73,7 +68,7 @@ export function useAuth() {
           router.push('/login');
         }
       } catch (error) {
-        console.error('Auth check failed:', error);
+        // console.error('Auth check failed:', error);
         setAuthState((prev) => ({
           ...prev,
           isLoggedIn: false,
