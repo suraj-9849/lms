@@ -38,7 +38,7 @@ export default function Home() {
               </Button>
             </div>
 
-            <div className="mx-auto mt-16 max-w-3xl pl-20 text-center">
+            <div className="mx-auto mt-16 max-w-3xl text-center">
               <h1 className="text-center text-4xl font-bold leading-tight tracking-tighter text-white sm:text-5xl md:text-6xl lg:text-7xl">
                 Learn, Grow and Make Others Grow!
               </h1>
