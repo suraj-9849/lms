@@ -25,7 +25,7 @@ export function UserAuthForm({ className, ...props }: React.HTMLAttributes<HTMLD
     };
 
     try {
-      const response = await fetch('http://localhost:3000/api/auth/signin', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/signin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
