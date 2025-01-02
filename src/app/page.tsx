@@ -33,8 +33,8 @@ export default function Home() {
                 />
               </div>
 
-              <Link href="/login">
-                <Button className="text-sm text-black text-primary">Login</Button>
+              <Link href="/login" className="text-black">
+                <Button className="text-sm text-black">Login</Button>
               </Link>
             </div>
           </nav>

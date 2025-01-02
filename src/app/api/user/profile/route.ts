@@ -37,7 +37,11 @@ export async function GET(request: NextRequest) {
     //   createdCoursesCount: user.created_courses.length
     // });
 
+    /* eslint-disable */
+    // putting the user data into  userWithoutPassword except the password: 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...userWithoutPassword } = user;
+     /* eslint-enable */
     return NextResponse.json(userWithoutPassword);
   } catch (error) {
     console.error('Database Error:', error);
@@ -73,7 +77,8 @@ export async function PUT(request: NextRequest) {
     // Linting Error:
     /* eslint-disable */
     // putting the user data into  userWithoutPassword except the password: 
-    const { password, ...userWithoutPassword } = updatedUser;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _password, ...userWithoutPassword } = updatedUser;
     /* eslint-enable */
     // sending back the data to the frontend
     return NextResponse.json(userWithoutPassword);
