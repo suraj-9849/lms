@@ -78,7 +78,7 @@ export async function PUT(request: NextRequest) {
     /* eslint-disable */
     // putting the user data into  userWithoutPassword except the password: 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password: _password, ...userWithoutPassword } = updatedUser;
+    const { password:_password, ...userWithoutPassword } = updatedUser;
     /* eslint-enable */
     // sending back the data to the frontend
     return NextResponse.json(userWithoutPassword);

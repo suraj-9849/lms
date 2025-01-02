@@ -49,7 +49,6 @@ function Page() {
       setUser(userData);
       setError(null);
     } catch (error) {
-      // console.error('Error fetching user profile:', error);
       setError(error instanceof Error ? error.message : 'An unknown error occurred');
       toast.error('Failed to load user profile');
     }
@@ -116,9 +115,9 @@ function Page() {
 
   return (
     <div>
-      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {user.created_courses &&
-          user.created_courses.map((course) => (
+      {user.created_courses && user.created_courses.length > 0 ? (
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {user.created_courses.map((course) => (
             <div key={course.course_id} className="relative">
               <CourseCard
                 title={course.title}
@@ -148,7 +147,19 @@ function Page() {
               </AlertDialog>
             </div>
           ))}
-      </div>
+        </div>
+      ) : (
+        <div className="flex min-h-[50vh] flex-col items-center justify-center text-center">
+          <h2 className="mb-4 text-2xl font-bold">No Courses Created Yet</h2>
+          <p className="mb-6 w-1/2 text-gray-600">
+            You havent created any courses. Start creating your first course to see it here! In this
+            settings page we can delete the courses which are created by the Instructors only!
+          </p>
+          <Button onClick={() => router.push('/dashboard/create-course')}>
+            Create Your First Course
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

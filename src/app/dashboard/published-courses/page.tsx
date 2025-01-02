@@ -198,8 +198,9 @@ const CoursePage = () => {
                 <PlusCircle className="mr-2 h-4 w-4" /> Create Your First Course
               </Button>
             ) : (
-              <Button onClick={() => router.push('/upgrade-account')}>
-                Upgrade to Course Creator
+              <Button onClick={() => router.push('/dashboard/profile')}>
+                Upgrade to Course Creator: To create the courses Click on the Settings button and
+                Change the role to CourseCreator in Profile Page
               </Button>
             )}
           </CardFooter>
