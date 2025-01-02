@@ -73,7 +73,7 @@ export async function PUT(request: NextRequest) {
     // Linting Error:
     /* eslint-disable */
     // putting the user data into  userWithoutPassword except the password: 
-    const { password, ...userWithoutPassword } = updatedUser;
+    const { password: _password, ...userWithoutPassword } = updatedUser;
     /* eslint-enable */
     // sending back the data to the frontend
     return NextResponse.json(userWithoutPassword);
