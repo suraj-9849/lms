@@ -3,14 +3,13 @@ import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { AuthState } from '@/utils/Interfaces';
 
-
 export function useAuth() {
   const [authState, setAuthState] = useState<AuthState>({
     isLoggedIn: false,
     isLoading: true,
     userId: null,
     email: null,
-    logout: async () => {},
+    logout: async () => { },
   });
   const router = useRouter();
 
@@ -22,70 +21,68 @@ export function useAuth() {
       });
 
       if (response.ok) {
-        setAuthState((prev) => ({
+        setAuthState(prev => ({
           ...prev,
           isLoggedIn: false,
           userId: null,
           email: null,
         }));
         toast.success('Logged out successfully');
+        router.push('/login');
       } else {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Logout failed');
+        throw new Error('Logout failed');
       }
-    } catch (error:unknown) {
-      console.error('Logout failed:', error);
-      toast.error('Failed to log out. Please try again.');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Logout failed. Please try again.');
     }
-  }, []);
+  }, [router]);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        // This route helps t
-        const response = await fetch('/api/auth/check', {
-          credentials: 'include',
-        });
+  const checkAuth = useCallback(async () => {
+    try {
+      console.log('Checking authentication status...');
+      const response = await fetch('/api/auth/check', {
+        credentials: 'include',
+      });
 
-        if (response.ok) {
-          const data = await response.json();
-          setAuthState({
-            isLoggedIn: data.isAuthenticated,
-            isLoading: false,
-            userId: data.userId,
-            email: data.email,
-            logout,
-          });
-        } else {
-          setAuthState((prev) => ({
-            ...prev,
-            isLoggedIn: false,
-            isLoading: false,
-            userId: null,
-            email: null,
-          }));
-          toast.error('Authentication failed. Please log in again.');
-          router.push('/login');
-        }
-      } catch (error:unknown) {
-        console.error('Auth check failed:', error);
-        setAuthState((prev) => ({
+      const data = await response.json();
+      console.log('Auth check response:', data);
+
+      if (response.ok && data.isAuthenticated) {
+        setAuthState(prev => ({
+          ...prev,
+          isLoggedIn: true,
+          isLoading: false,
+          userId: data.userId,
+          email: data.email,
+          logout,
+        }));
+      } else {
+        setAuthState(prev => ({
           ...prev,
           isLoggedIn: false,
           isLoading: false,
           userId: null,
           email: null,
+          logout,
         }));
-        toast.error('An error occurred while checking authentication.');
-        router.push('/login');
       }
-    };
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      setAuthState(prev => ({
+        ...prev,
+        isLoggedIn: false,
+        isLoading: false,
+        userId: null,
+        email: null,
+        logout,
+      }));
+    }
+  }, [logout]);
 
+  useEffect(() => {
     checkAuth();
-  }, [router, logout]);
+  }, [checkAuth]);
 
-  return {
-    ...authState,
-    logout,
-  };
+  return authState;
 }

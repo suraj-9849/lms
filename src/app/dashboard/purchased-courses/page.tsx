@@ -88,7 +88,7 @@ function PurchasedCourses() {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-2 sm:p-4">
       <h1 className="mb-6 text-2xl font-bold">My Courses</h1>
       <Tabs defaultValue="purchased">
         <TabsList className="mb-4">

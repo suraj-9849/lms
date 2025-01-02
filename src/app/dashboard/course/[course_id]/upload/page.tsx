@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { FileUpload } from '@/components/ui/file-upload';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,7 +21,7 @@ import { toast } from 'react-hot-toast';
 export default function UploadPage() {
   const [isOwner, setIsOwner] = useState<boolean | null>(null);
   const [ownershipError, setOwnershipError] = useState<string | null>(null);
-  const [videoBase64, setVideoBase64] = useState<string | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoTitle, setVideoTitle] = useState<string>('');
   const [isCheckingOwnership, setIsCheckingOwnership] = useState<boolean>(true);
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -30,8 +31,13 @@ export default function UploadPage() {
   const courseId = params.course_id as string;
 
   const checkCourseOwnership = useCallback(async () => {
-    if (!userId || !courseId) return;
-
+    if (!userId || !courseId) {
+      // console.log('Course ownership check aborted: missing userId or courseId', {
+      //   userId,
+      //   courseId,
+      // });
+      return;
+    }
     setIsCheckingOwnership(true);
     try {
       const response = await fetch(`/api/course/check-ownership?courseId=${courseId}`, {
@@ -42,12 +48,14 @@ export default function UploadPage() {
         },
       });
 
-      if (!response.ok) throw new Error('Failed to check course ownership');
+      if (!response.ok) {
+        throw new Error('Failed to check course ownership');
+      }
 
       const data = await response.json();
       setIsOwner(data.isOwner);
       setOwnershipError(data.isOwner ? null : data.reason);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error checking course ownership:', error);
       toast.error('Failed to verify course ownership');
       setOwnershipError('Failed to verify course ownership');
@@ -65,61 +73,58 @@ export default function UploadPage() {
     if (isLoggedIn && userId && courseId) {
       checkCourseOwnership();
     }
-  }, [isLoggedIn, isLoading, userId, courseId, router, checkCourseOwnership]);
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.type !== 'video/mp4') {
-      toast.error('Only MP4 videos are supported');
-      return;
-    }
-
-    try {
-      const base64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader(); // From Java
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-
-      setVideoBase64(base64);
-    } catch (error) {
-      console.error('Error converting video to base64:', error);
-      toast.error('Failed to process video file');
+  }, [
+    isLoggedIn,
+    isLoading,
+    userId,
+    courseId,
+    router,
+    checkCourseOwnership,
+    isOwner,
+    ownershipError,
+  ]);
+  const handleFileUpload = (files: File[]) => {
+    if (files.length > 0) {
+      setVideoFile(files[0]);
     }
   };
 
-  const handleUpload = async () => {
-    if (!videoBase64 || !videoTitle || !courseId || !userId) {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!videoFile || !videoTitle || !courseId) {
       toast.error('Please fill in all fields and select a video file');
       return;
     }
 
     setIsUploading(true);
+    if (!userId || !courseId) {
+      // console.log('Course ownership check aborted: missing userId or courseId', {
+      //   userId,
+      //   courseId,
+      // });
+      return;
+    }
+    const formData = new FormData();
+    formData.append('video', videoFile);
+    formData.append('title', videoTitle);
+    formData.append('courseId', courseId);
+    formData.append('uploaderId', userId);
 
     try {
       const response = await fetch('/api/upload-video', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          video: videoBase64,
-          title: videoTitle,
-          courseId: courseId,
-          uploaderId: userId,
-        }),
+        body: formData,
       });
 
-      if (!response.ok) throw new Error('Failed to upload video');
-
+      if (!response.ok) {
+        throw new Error('Failed to upload video');
+      }
+      // console.log('Video Uploaded Successfully!');
       toast.success('Video uploaded successfully');
-      setVideoBase64(null);
+      setVideoFile(null);
       setVideoTitle('');
       router.push('/dashboard/published-courses');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error uploading video:', error);
       toast.error('Failed to upload video');
     } finally {
@@ -163,7 +168,8 @@ export default function UploadPage() {
           <CardHeader>
             <CardTitle>Access Denied</CardTitle>
             <CardDescription>
-              {ownershipError || 'You do not have permission to upload videos for this course.'}
+              {ownershipError ||
+                'You do not have permission to upload videos for this course becoz ur not the course_instructor.'}
             </CardDescription>
           </CardHeader>
           <CardFooter>
@@ -182,7 +188,7 @@ export default function UploadPage() {
           <CardDescription>Add a new video to your course</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="videoTitle">Video Title</Label>
               <Input
@@ -196,18 +202,12 @@ export default function UploadPage() {
             </div>
             <div>
               <Label htmlFor="videoFile">Video File</Label>
-              <Input
-                id="videoFile"
-                type="file"
-                accept="video/mp4"
-                onChange={handleFileChange}
-                required
-              />
+              <FileUpload onChange={handleFileUpload} />
             </div>
-            <Button onClick={handleUpload} disabled={isUploading || !videoBase64 || !videoTitle}>
+            <Button type="submit" disabled={isUploading || !videoFile || !videoTitle}>
               {isUploading ? 'Uploading...' : 'Upload Video'}
             </Button>
-          </div>
+          </form>
         </CardContent>
       </Card>
     </div>

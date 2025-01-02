@@ -1,24 +1,20 @@
-// Main Page for getting the user Details:
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
-  // console.log('Profile API route called');
-  // console.log('Headers received:', Object.fromEntries(request.headers.entries()));
-  // These are being passed from the Frontend:
+  
   const userId = request.headers.get('X-User-Id');
   const userEmail = request.headers.get('X-User-Email');
+  
+  // console.log('Auth Headers:', { userId, userEmail });
 
   if (!userId || !userEmail) {
-    // console.log('No user ID or email found in headers');
+    console.log('Authentication Failed - Missing Credentials');
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
   }
 
-  // console.log('User ID from headers:', userId);
-  // console.log('User email from headers:', userEmail);
-
   try {
-    // Finding the User:
+    // console.log('Attempting to fetch user from database...');
     const user = await prisma.user.findUnique({
       where: { user_id: userId },
       include: {
@@ -28,24 +24,27 @@ export async function GET(request: NextRequest) {
         created_courses: true,
       },
     });
-// Missing:
+
     if (!user) {
-      // console.log('User not found in database');
+      // console.log('User not found in database:', userId);
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // console.log('User found:', user.email);
-    // Linting error :
-    /* eslint-disable */
+    // console.log('User found:', {
+    //   userId: user.user_id,
+    //   email: user.email,
+    //   purchasedCoursesCount: user.purchased_courses.length,
+    //   createdCoursesCount: user.created_courses.length
+    // });
+
     const { password, ...userWithoutPassword } = user;
-    /* eslint-enable */
-    // sending the details
     return NextResponse.json(userWithoutPassword);
-  } catch (error:unknown) {
-    console.error('Error fetching user profile:', error);
+  } catch (error) {
+    console.error('Database Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
 
 export async function PUT(request: NextRequest) {
   // Updating route = PUT:

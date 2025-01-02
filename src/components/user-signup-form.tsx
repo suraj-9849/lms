@@ -1,5 +1,4 @@
 'use client';
-
 import * as React from 'react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -9,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-
 export function UserSignUpForm({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [username, setUsername] = useState<string>('');
@@ -19,22 +17,20 @@ export function UserSignUpForm({ className, ...props }: React.HTMLAttributes<HTM
   async function onSubmit(event: React.SyntheticEvent) {
     event.preventDefault();
     setIsLoading(true);
-
     const userData = {
       username,
       email,
       password,
     };
-
     try {
-      const response = await fetch(`/api/auth/signup`, {
+      const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(userData),
       });
-
+      console.log(response);
       if (response.ok) {
         toast.success('Your account has been created.');
         setTimeout(() => {
@@ -50,7 +46,6 @@ export function UserSignUpForm({ className, ...props }: React.HTMLAttributes<HTM
       setIsLoading(false);
     }
   }
-
   return (
     <div className={cn('grid gap-6', className)} {...props}>
       <form onSubmit={onSubmit}>

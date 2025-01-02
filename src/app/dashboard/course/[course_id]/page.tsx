@@ -80,7 +80,7 @@ function DescriptionPage() {
       setCourseData(data);
     } catch (error: unknown) {
       console.error('Error fetching course data:', error);
-      toast.error('Failed to load course data');
+      toast.error('You Have not purchased the course: Redirecting to Purchase');
       router.push(`/dashboard/course/${courseId}/purchase`);
     } finally {
       setIsLoadingCourse(false);

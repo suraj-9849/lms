@@ -1,18 +1,21 @@
+
 import { NextRequest, NextResponse } from 'next/server';
 import { nanoid } from 'nanoid';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { fromEnv } from '@aws-sdk/credential-providers';
 import prisma from '@/lib/prisma';
-
 const s3 = new S3Client({
   region: 'auto',
   endpoint: process.env.ENDPOINT,
   credentials: fromEnv(),
 });
-
 export async function POST(req: NextRequest) {
   try {
-    const { video, title, courseId, uploaderId } = await req.json();
+    const formData = await req.formData();
+    const video = formData.get('video') as File;
+    const title = formData.get('title') as string;
+    const courseId = formData.get('courseId') as string;
+    const uploaderId = formData.get('uploaderId') as string;
 
     if (!video || !title || !courseId || !uploaderId) {
       return NextResponse.json(
@@ -21,9 +24,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Extract the base64 data (remove data:video/mp4;base64, prefix)
-    const base64Data = video.split(',')[1];
-    const buffer = Buffer.from(base64Data, 'base64');
+    // Read the file as ArrayBuffer
+    const buffer = Buffer.from(await video.arrayBuffer());
 
     // Generate filename
     const fileName = `${nanoid(12)}.mp4`;
@@ -33,7 +35,7 @@ export async function POST(req: NextRequest) {
         Bucket: process.env.BUCKET_NAME,
         Key: `videos/${fileName}`,
         Body: buffer,
-        ContentType: 'video/mp4',
+        ContentType: video.type,
       });
 
       await s3.send(command);

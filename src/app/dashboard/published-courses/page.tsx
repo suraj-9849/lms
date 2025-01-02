@@ -121,11 +121,11 @@ const CoursePage = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-1 sm:p-4">
       <div className="mb-6 flex items-center justify-between">
         <GradualSpacing
-          className="font-display text-center text-xl font-bold -tracking-widest text-black dark:text-white md:text-3xl"
-          text="Your Published Courses"
+          className="font-display text-md text-center font-bold -tracking-widest text-black dark:text-white sm:text-xl md:text-3xl"
+          text=" Published Courses"
         />
         {user.is_course_creator && (
           <Button onClick={() => router.push('/dashboard/create-course')}>

@@ -19,11 +19,16 @@ export default function DashboardPage() {
   const [filteredCourses, setFilteredCourses] = useState<CourseSchema[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+
   const { isLoggedIn, isLoading, userId, email } = useAuth();
   const router = useRouter();
 
   const fetchData = useCallback(async () => {
-    if (!userId || !email) return;
+    if (!userId || !email) {
+      return;
+    }
+
+    console.log('Fetching data with:', { userId, email });
 
     try {
       const [userResponse, coursesResponse] = await Promise.all([
@@ -48,7 +53,9 @@ export default function DashboardPage() {
       ]);
 
       if (!userResponse.ok || !coursesResponse.ok) {
-        throw new Error('Failed to fetch data');
+        const userError = await userResponse.text();
+        const coursesError = await coursesResponse.text();
+        throw new Error(`API Error: ${userError} ${coursesError}`);
       }
 
       const userData: UserSchema = await userResponse.json();
@@ -59,19 +66,23 @@ export default function DashboardPage() {
       setFilteredCourses(coursesData);
       setError(null);
     } catch (error) {
-      // console.error('Error fetching data:', error);
-      setError(error instanceof Error ? error.message : 'An unknown error occurred');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('Fetch error:', errorMessage);
+      setError(errorMessage);
+
       toast.error('Failed to load data');
     }
   }, [userId, email]);
 
   useEffect(() => {
-    if (isLoggedIn && userId && email && !user) {
+    if (isLoggedIn && userId && email) {
+      console.log('Auth conditions met, triggering fetch');
       fetchData();
     } else if (!isLoading && !isLoggedIn) {
+      console.log('Not authenticated, redirecting to login');
       router.push('/login');
     }
-  }, [isLoggedIn, isLoading, userId, email, router, fetchData, user]);
+  }, [isLoggedIn, isLoading, userId, email, router, fetchData]);
 
   useEffect(() => {
     const filtered = allCourses.filter(
@@ -83,27 +94,39 @@ export default function DashboardPage() {
   }, [searchTerm, allCourses]);
 
   if (isLoading) {
-    return <LoadingState />;
+    return (
+      <div>
+        <LoadingState />
+      </div>
+    );
   }
 
   if (!isLoggedIn) {
     return (
       <div className="flex h-screen items-center justify-center">
-        Please log in to view this page
+        <div>Please log in to view this page</div>
       </div>
     );
   }
 
   if (error) {
-    return <ErrorState error={error} />;
+    return (
+      <div>
+        <ErrorState error={error} />
+      </div>
+    );
   }
 
   if (!user) {
-    return <LoadingState />;
+    return (
+      <div>
+        <LoadingState />
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto p-2 sm:p-6">
       <div className="mb-8">
         <h1 className="mb-2 text-3xl font-bold">Welcome back, {user.display_name}!</h1>
         <p className="text-gray-600">Explore our wide range of courses below.</p>
@@ -137,6 +160,7 @@ export default function DashboardPage() {
   );
 }
 
+// Components
 function CourseCard({ course }: { course: CourseSchema }) {
   const router = useRouter();
   return (
@@ -174,6 +198,7 @@ function CourseCard({ course }: { course: CourseSchema }) {
     </Card>
   );
 }
+
 function LoadingState() {
   return (
     <div className="container mx-auto p-6">
