@@ -32,10 +32,6 @@ export default function UploadPage() {
 
   const checkCourseOwnership = useCallback(async () => {
     if (!userId || !courseId) {
-      // console.log('Course ownership check aborted: missing userId or courseId', {
-      //   userId,
-      //   courseId,
-      // });
       return;
     }
     setIsCheckingOwnership(true);
@@ -98,10 +94,6 @@ export default function UploadPage() {
 
     setIsUploading(true);
     if (!userId || !courseId) {
-      // console.log('Course ownership check aborted: missing userId or courseId', {
-      //   userId,
-      //   courseId,
-      // });
       return;
     }
     const formData = new FormData();
@@ -122,7 +114,6 @@ export default function UploadPage() {
       if (!response.ok) {
         throw new Error('Failed to upload video');
       }
-      // console.log('Video Uploaded Successfully!');
       toast.success('Video uploaded successfully');
       setVideoFile(null);
       setVideoTitle('');
