@@ -5,8 +5,8 @@ import GradualSpacing from '@/components/ui/gradual-spacing';
 
 export default function Home() {
   return (
-    <main className="h-screen">
-      <section className="to-bg relative h-full bg-gradient-to-b from-slate-900 via-blue-900">
+    <main className="flex h-screen w-full items-center justify-center">
+      <section className="to-bg relative flex h-full w-full items-center justify-center bg-gradient-to-b from-slate-900 via-blue-900">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
 
         <div className="relative flex h-full flex-col">
@@ -39,7 +39,7 @@ export default function Home() {
             </div>
           </nav>
 
-          <div className="flex flex-1 flex-col justify-center">
+          <div className="flex flex-1 flex-col items-center justify-center">
             <div className="container px-4">
               <div className="mx-auto max-w-3xl space-y-8 text-center">
                 <h1 className="text-4xl font-bold leading-tight tracking-tighter text-white md:text-5xl lg:text-6xl">

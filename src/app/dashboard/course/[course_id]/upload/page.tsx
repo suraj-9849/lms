@@ -111,10 +111,13 @@ export default function UploadPage() {
     formData.append('uploaderId', userId);
 
     try {
-      const response = await fetch('/api/upload-video', {
-        method: 'POST',
-        body: formData,
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/upload-video/upload`,
+        {
+          method: 'POST',
+          body: formData,
+        },
+      );
 
       if (!response.ok) {
         throw new Error('Failed to upload video');
