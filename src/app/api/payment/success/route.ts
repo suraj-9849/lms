@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import prisma from '@/lib/prisma';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function GET(req: NextRequest) {
   //  Getting the params!
@@ -24,6 +23,7 @@ export async function GET(req: NextRequest) {
 
   try {
     // Getting the session id and storing in the session:
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-04-30.basil' });
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     //  Checking whether it is paid-> if Paid then update the payment_status = true so that he can access the course
     if (session.payment_status === 'paid') {
