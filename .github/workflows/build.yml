@@ -3,21 +3,22 @@ name: Build Checking on the LMS
 on:
   pull_request:
     branches:
-        - main
-        - master
+      - main
+      - master
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Uses Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-      - name: Install Dependencies
-        run : npm install -g pnpm 
+          node-version: '22'
+      - name: Setup npm
+        run: |
+          npm install
       - name: Generate prisma
-        run : npx prisma generate
+        run: npx prisma generate
       - name: Build Checking
-        run : pnpm build
-
+        run: npm run build
