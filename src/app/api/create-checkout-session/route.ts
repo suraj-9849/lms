@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';// Payment Gateway!
-// Must required Field that why I kept !(Exclamation mark) 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+import Stripe from 'stripe'; // Payment Gateway!
 
 export async function POST(req: NextRequest) {
   try {
     //req.json = req.body
     const { courseId, userId, price, title } = await req.json();
+    // Must required Field that why I kept !(Exclamation mark)
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-04-30.basil' });
     //  This code will creates the checkout session page with details which are passed by the frontend and retireved here by req.json()
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -15,9 +15,7 @@ export async function POST(req: NextRequest) {
           price_data: {
             // Currency in INR
             currency: 'inr',
-            product_data: {
-              name: title,
-            },
+            product_data: { name: title },
             unit_amount: Math.round(price * 100),
           },
           quantity: 1,
