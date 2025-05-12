@@ -2,6 +2,5 @@
   "*.tsx": ["prettier --write", "eslint"],
   "*.jsx": ["prettier --write", "eslint"],
   "*.js": ["prettier --write", "eslint"],
-  "*.html": ["eslint", "prettier --write"],
-  "*.css": "prettier --write"
+  "*.html": ["eslint", "prettier --write"]
 }
