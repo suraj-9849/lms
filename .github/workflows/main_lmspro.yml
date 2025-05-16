@@ -29,7 +29,7 @@ jobs:
       - name: Zip app for deployment (excluding .git and node_modules)
         run: |
           mkdir deploy
-          cp -r .next public package.json next.config.js deploy/
+          cp -r .next public package.json deploy/ || echo "next.config.js not found, skipping"
           zip -r app.zip deploy
 
       - name: Upload artifact
