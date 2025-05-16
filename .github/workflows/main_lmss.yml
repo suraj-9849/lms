@@ -26,12 +26,14 @@ jobs:
       - name: Build Next.js app
         run: npm run build
 
-      - name: Zip app for deployment (excluding .git and node_modules)
+      - name: Zip app for deployment
         run: |
           mkdir deploy
-          cp -r .next public package.json deploy/ || echo "next.config.js not found, skipping"
+          cp -r .next deploy/
+          cp -r public deploy/
+          cp package.json deploy/
+          cp next.config.js deploy/ 2>/dev/null || true
           zip -r app.zip deploy
-
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
