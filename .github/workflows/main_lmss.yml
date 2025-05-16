@@ -1,4 +1,4 @@
-name: Build and deploy Next.js SSR app to Azure Web App - lmspro
+name: Build and deploy Node.js app to Azure Web App - lmss
 
 on:
   push:
@@ -10,36 +10,30 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: read #This is required for actions/checkout
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
-          node-version: '20.x'
+          node-version: '22.x'
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build Next.js app
-        run: npm run build
-
-      - name: Zip app for deployment
+      - name: npm install, build, and test
         run: |
-          mkdir deploy
-          cp -r .next deploy/
-          cp -r public deploy/
-          cp package.json deploy/
-          cp next.config.js deploy/ 2>/dev/null || true
-          zip -r app.zip deploy
+          npm install
+          npm run build --if-present
+          npm run test --if-present
 
-      - name: Upload artifact
+      - name: Zip artifact for deployment
+        run: zip release.zip ./* -r
+
+      - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: app
-          path: app.zip
+          name: node-app
+          path: release.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -48,29 +42,30 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write
-      contents: read
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
     steps:
-      - name: Download artifact
+      - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: app
+          name: node-app
 
-      - name: Unzip artifact
-        run: unzip app.zip
-
+      - name: Unzip artifact for deployment
+        run: unzip release.zip
+      
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_5DB236ACE96540BC9E8E418C8B880F9E }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_96CA9C7D2ED948EFA925C8C5213BE0FA }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_514E9201E19B4B799D1917F9C9687132 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F4CBF74D2EA34326BD9EFA2286C038BC }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_2B3F9D0F41704982AC6ABD2A39EE8377 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B8B96452A8BD49B9BC29694065A1A93F }}
 
-      - name: Deploy to Azure Web App
+      - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'lmspro'
+          app-name: 'lmss'
           slot-name: 'Production'
           package: .
+          
